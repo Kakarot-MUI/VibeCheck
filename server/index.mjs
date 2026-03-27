@@ -198,7 +198,8 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   // Catch-all to serve index.html for SPA routing
   app.use((req, res, next) => {
-    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
+    if (req.method === 'GET' && !req.path.startsWith('/api') && isHtml) {
       return res.sendFile(path.join(distPath, 'index.html'));
     }
     next();
