@@ -14,6 +14,8 @@ import Signup from './components/Signup';
 import ForgotPassword from './components/ForgotPassword';
 import ProfileSettings from './components/ProfileSettings';
 import SearchOverlay from './components/SearchOverlay';
+import StoriesBar from './components/StoriesBar';
+import StoryViewer from './components/StoryViewer';
 import { api } from './services/api';
 import './App.css';
 

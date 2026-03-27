@@ -58,5 +58,19 @@ export const api = {
     const res = await fetch(`${API_URL}/users/search?q=${encodeURIComponent(query)}`);
     if (!res.ok) throw new Error('Search failed');
     return res.json();
+  },
+  getStoriesFeed: async () => {
+    const res = await fetch(`${API_URL}/stories/feed`);
+    if (!res.ok) throw new Error('Failed to fetch stories');
+    return res.json();
+  },
+  createStory: async (email, imageUrl) => {
+    const res = await fetch(`${API_URL}/stories/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, imageUrl })
+    });
+    if (!res.ok) throw new Error('Failed to post story');
+    return res.json();
   }
 };
