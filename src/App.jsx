@@ -22,13 +22,37 @@ function App() {
   const [globalState, setGlobalState] = useState(vibeConfigData);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isPublicView, setIsPublicView] = useState(false);
 
-  // Persistence: Fetch profile on mount if email exists
+  // Persistence: Fetch profile on mount
   useEffect(() => {
-    const savedEmail = localStorage.getItem('vibe_email');
-    if (savedEmail) {
-      handleAutoLogin(savedEmail);
-    }
+    const checkRoute = async () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/u/')) {
+        const username = path.split('/u/')[1];
+        if (username) {
+          try {
+            setLoading(true);
+            const res = await api.getPublicProfile(username);
+            setGlobalState(res.profile);
+            setIsPublicView(true);
+            setCurrentView('dashboard');
+          } catch (err) {
+            console.error("Public profile not found:", err);
+            setCurrentView('login');
+          } finally {
+            setLoading(false);
+          }
+          return;
+        }
+      }
+
+      const savedEmail = localStorage.getItem('vibe_email');
+      if (savedEmail) {
+        handleAutoLogin(savedEmail);
+      }
+    };
+    checkRoute();
   }, []);
 
   const handleAutoLogin = async (email) => {
@@ -130,10 +154,16 @@ function App() {
       {currentView === 'dashboard' && (
         <div className="app-layout">
           <header className="app-header reveal-1">
-            <ThemeSwitcher 
-              onLogout={handleLogout} 
-              onOpenSettings={() => setIsSettingsOpen(true)} 
-            />
+            {!isPublicView ? (
+              <ThemeSwitcher 
+                onLogout={handleLogout} 
+                onOpenSettings={() => setIsSettingsOpen(true)} 
+              />
+            ) : (
+              <div className="viewer-controls">
+                <button className="back-btn" onClick={() => window.location.href = '/'}>Create Your Own Vibe</button>
+              </div>
+            )}
           </header>
 
           <main className="app-container">

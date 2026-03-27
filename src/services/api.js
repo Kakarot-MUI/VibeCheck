@@ -48,5 +48,15 @@ export const api = {
       throw new Error(error.error || 'Update failed');
     }
     return res.json();
+  },
+  getPublicProfile: async (username) => {
+    const res = await fetch(`${API_URL}/p/${username}`);
+    if (!res.ok) throw new Error('Profile not found');
+    return res.json();
+  },
+  searchUsers: async (query) => {
+    const res = await fetch(`${API_URL}/users/search?q=${encodeURIComponent(query)}`);
+    if (!res.ok) throw new Error('Search failed');
+    return res.json();
   }
 };

@@ -174,7 +174,8 @@ app.post('/api/auth/login', async (req, res) => {
         isPlaying: p.now_playing_is_playing 
       },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
+      username: p.username
     };
 
     res.json({ user: { email, name: userRes.rows[0].name }, profile });
@@ -216,7 +217,8 @@ app.post('/api/profile/update', async (req, res) => {
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
+      username: p.username
     };
 
     res.json({ profile: finalProfile });
@@ -224,8 +226,41 @@ app.post('/api/profile/update', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// Profile: Public Fetch
+app.get('/api/p/:username', async (req, res) => {
+  const { username } = req.params;
+  try {
+    const profileRes = await pool.query('SELECT * FROM profiles WHERE username = $1', [username]);
+    if (profileRes.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+    
+    const p = profileRes.rows[0];
+    const profile = {
+      profile: { name: p.name, bio: p.bio, avatarUrl: p.avatar_url },
+      mood: { vibe: p.mood_vibe, color: p.mood_color },
+      nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
+      photoWidgetText: p.photo_widget_text,
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
+      username: p.username
+    };
+    res.json({ profile });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// 3. Serve Frontend (Unified Hosting)
+// Users: Search
+app.get('/api/users/search', async (req, res) => {
+  const { q } = req.query;
+  try {
+    const searchRes = await pool.query(
+      'SELECT name, username, avatar_url FROM profiles WHERE username ILIKE $1 OR name ILIKE $1 LIMIT 10',
+      [`%${q}%`]
+    );
+    res.json({ results: searchRes.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
