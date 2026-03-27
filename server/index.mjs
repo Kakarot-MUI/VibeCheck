@@ -62,6 +62,9 @@ const initDb = async () => {
 initDb();
 
 // 2. API Routes
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/ping', (req, res) => res.send('pong'));
+
 // Auth: Register
 app.post('/api/auth/register', async (req, res) => {
   const { email, password, name } = req.body;
@@ -180,7 +183,7 @@ app.post('/api/profile/update', async (req, res) => {
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get('*', (req, res) => {
+  app.get('/*', (req, res) => {
     if (!req.path.startsWith('/api')) {
       res.sendFile(path.join(distPath, 'index.html'));
     }
