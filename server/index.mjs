@@ -16,6 +16,16 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Robust Error Logging for Production
+process.on('uncaughtException', (err) => {
+  console.error('🔥 UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔥 UNHANDLED REJECTION at:', promise, 'reason:', reason);
+});
+
+console.log("🚀 Server Starting...");
+
 // Ensure stories directory exists
 const uploadDir = path.join(__dirname, 'public', 'stories');
 if (!fs.existsSync(uploadDir)) {
@@ -61,8 +71,10 @@ app.use((req, res, next) => {
 
 // 1. Database Initialization
 const initDb = async () => {
+  console.log("⏳ Initializing Database...");
   try {
     const client = await pool.connect();
+    console.log("🔗 Connected to Pool");
     // Create Users table
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -439,5 +451,5 @@ if (fs.existsSync(distPath)) {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`VibeCheck Full-Stack running on port ${PORT}`);
+  console.log(`✅ VibeCheck Full-Stack running on port ${PORT}`);
 });
