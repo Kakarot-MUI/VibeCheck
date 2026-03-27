@@ -82,11 +82,17 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
               <div className="share-section glass-card-mini">
                  <label className="share-label">Your Shareable ID</label>
                  <div className="share-url-container">
-                   <span className="share-url">{window.location.origin}/u/{state.profile.username}</span>
-                   <button type="button" className="copy-btn" onClick={() => {
-                     navigator.clipboard.writeText(`${window.location.origin}/u/${state.profile.username}`);
-                     alert("Link copied to clipboard! 🚀");
-                   }}>Copy</button>
+                   <span className="share-url">
+                     {state.profile.username 
+                       ? `${window.location.origin}/u/${state.profile.username}` 
+                       : "Generating your unique ID... (Try Logout/Login)"}
+                   </span>
+                   {state.profile.username && (
+                     <button type="button" className="copy-btn" onClick={() => {
+                       navigator.clipboard.writeText(`${window.location.origin}/u/${state.profile.username}`);
+                       alert("Link copied to clipboard! 🚀");
+                     }}>Copy</button>
+                   )}
                  </div>
               </div>
 
