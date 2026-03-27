@@ -80,19 +80,30 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
           {activeTab === 'profile' && (
             <div className="tab-content reveal-1">
               <div className="share-section glass-card-mini">
-                 <label className="share-label">Your Shareable ID</label>
-                 <div className="share-url-container">
-                   <span className="share-url">
-                     {state.profile.username 
-                       ? `${window.location.origin}/u/${state.profile.username}` 
-                       : "Generating your unique ID... (Try Logout/Login)"}
-                   </span>
-                   {state.profile.username && (
-                     <button type="button" className="copy-btn" onClick={() => {
-                       navigator.clipboard.writeText(`${window.location.origin}/u/${state.profile.username}`);
-                       alert("Link copied to clipboard! 🚀");
-                     }}>Copy</button>
-                   )}
+                 <div className="share-group">
+                   <label className="share-label">Your Unique ID (Code)</label>
+                   <div className="share-row">
+                     <span className="share-id-text">{state.profile.username || "Generating..."}</span>
+                     <button type="button" className="copy-btn-minimal" onClick={() => {
+                       if (state.profile.username) {
+                         navigator.clipboard.writeText(state.profile.username);
+                         alert("ID Code copied! 🆔");
+                       }
+                     }}>Copy ID</button>
+                   </div>
+                 </div>
+                 
+                 <div className="share-group" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                   <label className="share-label">Shareable Link</label>
+                   <div className="share-row">
+                     <span className="share-link-text">{state.profile.username ? `${window.location.origin}/u/${state.profile.username}` : "..."}</span>
+                     <button type="button" className="copy-btn-minimal" onClick={() => {
+                       if (state.profile.username) {
+                         navigator.clipboard.writeText(`${window.location.origin}/u/${state.profile.username}`);
+                         alert("Link copied! 🚀");
+                       }
+                     }}>Copy Link</button>
+                   </div>
                  </div>
               </div>
 

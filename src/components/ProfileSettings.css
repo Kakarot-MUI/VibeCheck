@@ -304,56 +304,71 @@
   color: var(--text-muted);
 }
 
-/* Share Section */
+/* Share Section Redesign */
 .share-section {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(139, 92, 246, 0.08);
   border: 1px solid rgba(139, 92, 246, 0.2);
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: 16px;
+  padding: 1.2rem;
   margin-bottom: 2rem;
+}
+
+.share-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .share-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--accent-primary);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
-  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  opacity: 0.8;
 }
 
-.share-url-container {
+.share-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 }
 
-.share-url {
-  font-family: monospace;
-  font-size: 0.85rem;
+.share-id-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: #fff;
-  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+.share-link-text {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.copy-btn {
-  background: var(--accent-primary);
+.copy-btn-minimal {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  border: none;
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.copy-btn:hover {
-  background: var(--accent-secondary);
+.copy-btn-minimal:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   transform: scale(1.05);
 }
 
