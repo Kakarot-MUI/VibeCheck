@@ -131,11 +131,13 @@ app.post('/api/auth/login', async (req, res) => {
     const profileRes = await pool.query('SELECT * FROM profiles WHERE email = $1', [email]);
     const p = profileRes.rows[0];
 
-    // Map DB fields back to frontend structure
+    // Map DB fields back to sync with local vibe-config structure
     const profile = {
-      name: p.name,
-      bio: p.bio,
-      avatarUrl: p.avatar_url,
+      profile: {
+        name: p.name,
+        bio: p.bio,
+        avatarUrl: p.avatar_url
+      },
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { 
         title: p.now_playing_title, 
@@ -177,9 +179,11 @@ app.post('/api/profile/update', async (req, res) => {
     const updated = await pool.query('SELECT * FROM profiles WHERE email = $1', [email]);
     const p = updated.rows[0];
     const finalProfile = {
-      name: p.name,
-      bio: p.bio,
-      avatarUrl: p.avatar_url,
+      profile: {
+        name: p.name,
+        bio: p.bio,
+        avatarUrl: p.avatar_url
+      },
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
