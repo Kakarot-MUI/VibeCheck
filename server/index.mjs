@@ -152,7 +152,7 @@ app.post('/api/auth/login', async (req, res) => {
         isPlaying: p.now_playing_is_playing 
       },
       photoWidgetText: p.photo_widget_text,
-      links: typeof p.links === 'string' ? JSON.parse(p.links) : p.links
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
     };
 
     res.json({ user: { email, name: userRes.rows[0].name }, profile });
@@ -193,7 +193,7 @@ app.post('/api/profile/update', async (req, res) => {
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
-      links: typeof p.links === 'string' ? JSON.parse(p.links) : p.links
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
     };
 
     res.json({ profile: finalProfile });
