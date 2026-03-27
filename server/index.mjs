@@ -415,36 +415,6 @@ app.get('/api/posts/:username', async (req, res) => {
   }
 });
 
-// Stories: Get Feed (Active stories from everyone)
-app.get('/api/stories/feed', async (req, res) => {
-  try {
-    const storiesRes = await pool.query(`
-      SELECT s.*, p.name, p.username, p.avatar_url 
-      FROM stories s
-      JOIN profiles p ON s.user_email = p.email
-      WHERE s.expires_at > CURRENT_TIMESTAMP
-      ORDER BY s.created_at DESC
-    `);
-    
-    // Group by user
-    const feed = storiesRes.rows.reduce((acc, story) => {
-      if (!acc[story.username]) {
-        acc[story.username] = {
-          username: story.username,
-          name: story.name,
-          avatar: story.avatar_url,
-          stories: []
-        };
-      }
-      acc[story.username].stories.push(story);
-      return acc;
-    }, {});
-    
-    res.json({ feed: Object.values(feed) });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
