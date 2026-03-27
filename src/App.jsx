@@ -205,18 +205,20 @@ function App() {
                 <p>Welcome! Tap <span>Edit Hub</span> above to add your music and vibe. 🚀</p>
               </div>
             )}
-            {/* Left Column - Profile & Core Info */}
-            <div className="left-column reveal-2">
-              <ProfileHeader profile={globalState.profile} />
-              <MoodBadge mood={globalState.mood} />
-              <ClockWidget />
-            </div>
+            <div className="main-content-row">
+              {/* Left Column - Profile & Core Info */}
+              <div className="left-column reveal-2">
+                <ProfileHeader profile={globalState.profile} />
+                <MoodBadge mood={globalState.mood} />
+                <ClockWidget />
+              </div>
 
-            {/* Right Column - Media & Socials */}
-            <div className="right-column reveal-3">
-              <NowPlaying data={globalState.nowPlaying} />
-              <PhotoWidget text={globalState.photoWidgetText} />
-              <SocialDock links={globalState.links} />
+              {/* Right Column - Media & Socials */}
+              <div className="right-column reveal-3">
+                <NowPlaying data={globalState.nowPlaying} />
+                <PhotoWidget text={globalState.photoWidgetText} />
+                <SocialDock links={globalState.links} />
+              </div>
             </div>
           </main>
 
