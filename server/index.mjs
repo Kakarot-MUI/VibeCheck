@@ -175,7 +175,8 @@ app.post('/api/auth/login', async (req, res) => {
       profile: {
         name: p.name,
         bio: p.bio,
-        avatarUrl: p.avatar_url
+        avatarUrl: p.avatar_url,
+        username: p.username
       },
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { 
@@ -185,8 +186,7 @@ app.post('/api/auth/login', async (req, res) => {
         isPlaying: p.now_playing_is_playing 
       },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
-      username: p.username
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
     };
 
     res.json({ user: { email, name: userRes.rows[0].name }, profile });
@@ -223,13 +223,13 @@ app.post('/api/profile/update', async (req, res) => {
       profile: {
         name: p.name,
         bio: p.bio,
-        avatarUrl: p.avatar_url
+        avatarUrl: p.avatar_url,
+        username: p.username
       },
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
-      username: p.username
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
     };
 
     res.json({ profile: finalProfile });
@@ -246,12 +246,16 @@ app.get('/api/p/:username', async (req, res) => {
     
     const p = profileRes.rows[0];
     const profile = {
-      profile: { name: p.name, bio: p.bio, avatarUrl: p.avatar_url },
+      profile: { 
+        name: p.name, 
+        bio: p.bio, 
+        avatarUrl: p.avatar_url,
+        username: p.username 
+      },
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
-      username: p.username
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
     };
     res.json({ profile });
   } catch (err) {
