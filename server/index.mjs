@@ -286,7 +286,8 @@ app.post('/api/profile/update', async (req, res) => {
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
+      musicUrl: p.music_url || ''
     };
 
     res.json({ profile: finalProfile });
@@ -294,6 +295,7 @@ app.post('/api/profile/update', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // Profile: Public Fetch
 app.get('/api/p/:username', async (req, res) => {
   const { username } = req.params;
@@ -312,7 +314,8 @@ app.get('/api/p/:username', async (req, res) => {
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
+      musicUrl: p.music_url || ''
     };
     res.json({ profile });
   } catch (err) {
