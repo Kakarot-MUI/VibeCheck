@@ -14,6 +14,8 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
   const [nowPlaying, setNowPlaying] = useState(state.nowPlaying);
   // Widget State
   const [photoWidgetText, setPhotoWidgetText] = useState(state.photoWidgetText || "");
+  // Social Links State
+  const [links, setLinks] = useState(state.links || []);
 
   const fileInputRef = useRef(null);
 
@@ -41,9 +43,22 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
       profile, 
       mood, 
       nowPlaying: { ...nowPlaying, isPlaying: nowPlaying.title !== "No music playing" }, 
-      photoWidgetText 
+      photoWidgetText,
+      links
     });
     onClose();
+  };
+
+  const addLink = () => {
+    setLinks([...links, { id: Date.now(), title: "New Link", url: "https://", platform: "default" }]);
+  };
+
+  const updateLink = (id, field, value) => {
+    setLinks(links.map(l => l.id === id ? { ...l, [field]: value } : l));
+  };
+
+  const removeLink = (id) => {
+    setLinks(links.filter(l => l.id !== id));
   };
 
   return (
@@ -58,6 +73,7 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
           <button className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Profile</button>
           <button className={`tab-btn ${activeTab === 'vibe' ? 'active' : ''}`} onClick={() => setActiveTab('vibe')}>Vibe</button>
           <button className={`tab-btn ${activeTab === 'music' ? 'active' : ''}`} onClick={() => setActiveTab('music')}>Music</button>
+          <button className={`tab-btn ${activeTab === 'links' ? 'active' : ''}`} onClick={() => setActiveTab('links')}>Links</button>
         </div>
 
         <form onSubmit={handleSubmit} className="settings-form scrollable">
@@ -108,7 +124,6 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
               </div>
             </div>
           )}
-
           {activeTab === 'music' && (
             <div className="tab-content reveal-1">
               <div className="setting-item">
@@ -123,6 +138,43 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
                 <label>Album Art URL</label>
                 <input type="text" value={nowPlaying.albumArt} onChange={(e) => setNowPlaying({...nowPlaying, albumArt: e.target.value})} className="glass-input" placeholder="https://..." />
               </div>
+            </div>
+          )}
+          
+          {activeTab === 'links' && (
+            <div className="tab-content reveal-1">
+              <div className="links-list">
+                {links.map((link) => (
+                  <div key={link.id} className="link-edit-item glass-card-mini">
+                    <div className="link-row">
+                      <select 
+                        value={link.platform} 
+                        onChange={(e) => updateLink(link.id, 'platform', e.target.value)}
+                        className="glass-input platform-select"
+                      >
+                        <option value="default">Platform</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="twitter">Twitter</option>
+                        <option value="github">GitHub</option>
+                        <option value="spotify">Spotify</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="discord">Discord</option>
+                        <option value="steam">Steam</option>
+                      </select>
+                      <input 
+                        type="text" 
+                        value={link.url} 
+                        onChange={(e) => updateLink(link.id, 'url', e.target.value)}
+                        className="glass-input"
+                        placeholder="URL (https://...)"
+                      />
+                      <button type="button" onClick={() => removeLink(link.id)} className="remove-link-btn">&times;</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" onClick={addLink} className="add-link-btn">+ Add Social Link</button>
             </div>
           )}
 

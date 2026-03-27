@@ -165,20 +165,21 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/profile/update', async (req, res) => {
   const { email, profileData } = req.body;
   try {
-    const { profile, mood, nowPlaying, photoWidgetText } = profileData;
+    const { profile, mood, nowPlaying, photoWidgetText, links } = profileData;
     
     await pool.query(`
       UPDATE profiles SET 
         name = $1, bio = $2, avatar_url = $3, 
         mood_vibe = $4, mood_color = $5, 
         now_playing_title = $6, now_playing_artist = $7, now_playing_album_art = $8, 
-        now_playing_is_playing = $9, photo_widget_text = $10
-      WHERE email = $11
+        now_playing_is_playing = $9, photo_widget_text = $10,
+        links = $11
+      WHERE email = $12
     `, [
       profile.name, profile.bio, profile.avatarUrl,
       mood.vibe, mood.color,
       nowPlaying.title, nowPlaying.artist, nowPlaying.albumArt,
-      nowPlaying.isPlaying, photoWidgetText, email
+      nowPlaying.isPlaying, photoWidgetText, JSON.stringify(links), email
     ]);
 
     // Fetch updated profile to return
