@@ -86,9 +86,33 @@ const initDb = async () => {
         now_playing_album_art TEXT,
         now_playing_is_playing BOOLEAN,
         photo_widget_text TEXT,
-        links JSONB
+        links JSONB,
+        username TEXT UNIQUE
       )
     `);
+
+    // Create Stories table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS stories (
+        id SERIAL PRIMARY KEY,
+        email TEXT REFERENCES users(email),
+        image_url TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL
+      )
+    `);
+
+    // Create Posts table (Instagram-style)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id SERIAL PRIMARY KEY,
+        email TEXT REFERENCES users(email),
+        image_url TEXT NOT NULL,
+        caption TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     client.release();
     console.log("✅ PostgreSQL Tables Synced & Connected 🚀");
   } catch (err) {
@@ -327,18 +351,55 @@ app.post('/api/stories/upload', upload.single('image'), async (req, res) => {
   }
 });
 
-// LEGACY (REMAINING COMPATIBLE)
-app.post('/api/stories/create', async (req, res) => {
-  const { email, imageUrl } = req.body;
+// Stories: Feed
+app.get('/api/stories/feed', async (req, res) => {
   try {
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
-    
+    const feedRes = await pool.query(`
+      SELECT 
+        p.username, p.name, p.avatar_url as avatar,
+        json_agg(json_build_object('id', s.id, 'image_url', s.image_url)) as stories
+      FROM stories s
+      JOIN profiles p ON s.email = p.email
+      WHERE s.expires_at > NOW()
+      GROUP BY p.username, p.name, p.avatar_url
+    `);
+    res.json({ feed: feedRes.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch stories feed' });
+  }
+});
+
+// POSTS: Create (Native)
+app.post('/api/posts/create', upload.single('image'), async (req, res) => {
+  try {
+    const { email, caption } = req.body;
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const imageUrl = `/stories/${req.file.filename}`; // reusing stories folder for simplicity
     await pool.query(
-      'INSERT INTO stories (user_email, image_url, expires_at) VALUES ($1, $2, $3)',
-      [email, imageUrl, expiresAt]
+      'INSERT INTO posts (email, image_url, caption) VALUES ($1, $2, $3)',
+      [email, imageUrl, caption || '']
     );
-    res.json({ message: 'Story posted!' });
+
+    res.json({ success: true, imageUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Post failed' });
+  }
+});
+
+// POSTS: Fetch for User
+app.get('/api/posts/:username', async (req, res) => {
+  const { username } = req.params;
+  try {
+    const postsRes = await pool.query(`
+      SELECT po.* FROM posts po
+      JOIN profiles pr ON po.email = pr.email
+      WHERE pr.username = $1
+      ORDER BY po.created_at DESC
+    `, [username]);
+    res.json({ posts: postsRes.rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

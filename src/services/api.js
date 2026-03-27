@@ -84,5 +84,23 @@ export const api = {
     });
     if (!res.ok) throw new Error('Photo upload failed');
     return res.json();
+  },
+  uploadPost: async (email, file, caption) => {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('image', file);
+    formData.append('caption', caption || '');
+
+    const res = await fetch(`${API_URL}/posts/create`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!res.ok) throw new Error('Post upload failed');
+    return res.json();
+  },
+  getUserPosts: async (username) => {
+    const res = await fetch(`${API_URL}/posts/${username}`);
+    if (!res.ok) throw new Error('Failed to fetch posts');
+    return res.json();
   }
 };

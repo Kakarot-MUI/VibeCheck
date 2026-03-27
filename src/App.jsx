@@ -16,6 +16,7 @@ import ProfileSettings from './components/ProfileSettings';
 import SearchOverlay from './components/SearchOverlay';
 import StoriesBar from './components/StoriesBar';
 import StoryViewer from './components/StoryViewer';
+import PostsGrid from './components/PostsGrid';
 import { api } from './services/api';
 import './App.css';
 
@@ -28,6 +29,7 @@ function App() {
   const [isPublicView, setIsPublicView] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [viewingStories, setViewingStories] = useState(null);
+  const [refreshPosts, setRefreshPosts] = useState(0);
 
   // Persistence: Fetch profile on mount
   useEffect(() => {
@@ -135,8 +137,29 @@ function App() {
     }
   };
 
+  const handlePostChange = async (e) => {
+    const file = e.target.files[0];
+    if (file && userEmail) {
+      const caption = prompt("Add a caption for your post:");
+      try {
+        setLoading(true);
+        await api.uploadPost(userEmail, file, caption);
+        alert("Vibe Shared to Feed! ✨");
+        setRefreshPosts(prev => prev + 1);
+      } catch (err) {
+        alert("Failed to post: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleAddStory = () => {
     document.getElementById('story-upload-input').click();
+  };
+
+  const handleAddPost = () => {
+    document.getElementById('post-upload-input').click();
   };
 
   const updateGlobalState = async (newData) => {
@@ -254,6 +277,13 @@ function App() {
             style={{ display: 'none' }} 
             accept="image/*"
             onChange={handleFileChange}
+          />
+          <input 
+            type="file" 
+            id="post-upload-input" 
+            style={{ display: 'none' }} 
+            accept="image/*"
+            onChange={handlePostChange}
           />
         </div>
       )}
