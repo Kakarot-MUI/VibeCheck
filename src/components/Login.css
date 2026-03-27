@@ -1,4 +1,4 @@
-.login-screen {
+.auth-container {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
@@ -8,36 +8,30 @@
   padding: 1.5rem;
 }
 
-.login-glow {
-  position: absolute;
-  width: 30vw;
-  height: 30vw;
-  background: var(--accent-primary);
-  filter: blur(150px);
-  opacity: 0.2;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.login-card {
+.auth-card {
   text-align: center;
 }
 
-.login-header {
-  margin-bottom: 2.5rem;
+.auth-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.login-subtitle {
+.auth-subtitle {
   color: var(--text-muted);
   font-size: 0.9rem;
-  margin-top: 0.5rem;
+  margin-bottom: 2.5rem;
   letter-spacing: 1px;
 }
 
-.login-form {
+.auth-form {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+}
+
+.input-group {
+  width: 100%;
 }
 
 .glass-input {
@@ -58,7 +52,7 @@
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
 }
 
-.login-submit-btn {
+.auth-submit-btn {
   position: relative;
   margin-top: 1rem;
   padding: 1rem;
@@ -70,52 +64,41 @@
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-.login-submit-btn:hover {
+.auth-submit-btn:hover {
   transform: translateY(-2px);
+  background: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
-.login-submit-btn:active {
+.auth-submit-btn:active {
   transform: translateY(0);
 }
 
-.btn-glow {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-}
-
-.login-submit-btn:hover .btn-glow {
-  opacity: 1;
-}
-
-.login-submit-btn:hover span {
-  color: #fff;
-}
-
-.login-footer {
+.auth-footer {
   margin-top: 2rem;
   font-size: 0.85rem;
   color: var(--text-muted);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-.login-footer a {
+.auth-link {
   color: var(--text-muted);
-  text-decoration: none;
+  cursor: pointer;
   transition: color 0.3s ease;
 }
 
-.login-footer a:hover {
+.auth-link:hover {
   color: var(--accent-secondary);
+  text-decoration: underline;
 }
 
-.divider {
-  margin: 0 0.8rem;
+.dot {
   opacity: 0.3;
 }
