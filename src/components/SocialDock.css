@@ -1,0 +1,72 @@
+.social-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.dock-title {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.dock-icons {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dock-icon-link {
+  color: var(--text-main);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.icon-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: var(--accent-primary);
+  filter: blur(15px);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.dock-icon-link:hover {
+  transform: translateY(-8px) scale(1.2);
+  color: var(--accent-primary);
+}
+
+.dock-icon-link:hover .icon-glow {
+  opacity: 0.4;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+@media (max-width: 480px) {
+  .dock-icons {
+    gap: 1rem;
+  }
+}

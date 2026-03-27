@@ -1,0 +1,61 @@
+.bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  background-color: var(--bg-color);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.4;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+  width: 45vw;
+  height: 45vw;
+  background: var(--accent-primary);
+  top: -10vw;
+  left: -10vw;
+  animation-duration: 25s;
+}
+
+.orb-2 {
+  width: 50vw;
+  height: 50vw;
+  background: var(--accent-secondary);
+  bottom: -15vw;
+  right: -10vw;
+  animation-duration: 30s;
+  animation-direction: alternate-reverse;
+}
+
+.orb-3 {
+  width: 35vw;
+  height: 35vw;
+  background: #ec4899; /* Neon Pink accent */
+  top: 40%;
+  left: 30%;
+  animation-duration: 35s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(5vw, -5vh) scale(1.1);
+  }
+  66% {
+    transform: translate(-3vw, 4vh) scale(0.9);
+  }
+  100% {
+    transform: translate(4vw, 2vh) scale(1.05);
+  }
+}

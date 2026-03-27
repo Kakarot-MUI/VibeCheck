@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "name": "Alex Chen",
+    "bio": "Frontend Dev x Digital Creator. Embracing the dark mode aesthetic. ⚡",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
+    "status": "online"
+  },
+  "mood": {
+    "vibe": "Deep Focus 🎧",
+    "color": "var(--accent-secondary)"
+  },
+  "nowPlaying": {
+    "title": "Midnight City",
+    "artist": "M83",
+    "albumArt": "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
+    "isPlaying": true
+  },
+  "links": [
+    { "id": 1, "title": "Instagram", "url": "https://instagram.com/yourhandle", "platform": "instagram" },
+    { "id": 2, "title": "Main Channel", "url": "https://youtube.com/@yourchannel", "platform": "youtube" },
+    { "id": 3, "title": "LinkedIn Profile", "url": "https://linkedin.com/in/yourprofile", "platform": "linkedin" },
+    { "id": 4, "title": "Twitter / X", "url": "https://twitter.com/yourhandle", "platform": "twitter" },
+    { "id": 5, "title": "Steam Profile", "url": "https://steamcommunity.com/id/yourid", "platform": "steam" },
+    { "id": 6, "title": "Spotify Playlist", "url": "https://open.spotify.com/playlist/yourplaylist", "platform": "spotify" },
+    { "id": 7, "title": "GitHub Projects", "url": "https://github.com/yourhandle", "platform": "github" }
+  ]
+}
