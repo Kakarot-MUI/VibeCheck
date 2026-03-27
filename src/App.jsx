@@ -27,6 +27,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isPublicView, setIsPublicView] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [viewingStories, setViewingStories] = useState(null);
 
   // Persistence: Fetch profile on mount
   useEffect(() => {
@@ -118,6 +119,19 @@ function App() {
     setGlobalState(vibeConfigData);
   };
 
+  const handleAddStory = async () => {
+    const url = prompt("Enter Image URL for your Story (e.g., from Unsplash or Imgur):");
+    if (url && userEmail) {
+      try {
+        await api.createStory(userEmail, url);
+        alert("Vibe Posted! ✨ (It will appear in the feed shortly)");
+        window.location.reload(); 
+      } catch (err) {
+        alert("Failed to post story: " + err.message);
+      }
+    }
+  };
+
   const updateGlobalState = async (newData) => {
     try {
       const res = await api.updateProfile(userEmail, newData);
@@ -176,6 +190,16 @@ function App() {
           </header>
 
           <main className="app-container">
+            {!isPublicView && (
+              <div className="stories-wrapper reveal-1">
+                <StoriesBar 
+                  userAvatar={globalState.profile.avatarUrl} 
+                  onSelectStory={setViewingStories}
+                  onAddStory={handleAddStory}
+                />
+              </div>
+            )}
+            
             {globalState.profile.name === "Your Name Here" && (
               <div className="setup-hint reveal-1">
                 <p>Welcome! Tap <span>Edit Hub</span> above to add your music and vibe. 🚀</p>
@@ -206,6 +230,13 @@ function App() {
 
           {isSearchOpen && (
             <SearchOverlay onClose={() => setIsSearchOpen(false)} />
+          )}
+
+          {viewingStories && (
+            <StoryViewer 
+              userStories={viewingStories} 
+              onClose={() => setViewingStories(null)} 
+            />
           )}
         </div>
       )}
