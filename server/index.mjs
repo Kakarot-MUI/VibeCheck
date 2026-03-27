@@ -7,7 +7,7 @@ import fs from 'fs';
 import multer from 'multer';
 import pg from 'pg';
 import dotenv from 'dotenv';
-import fs from 'fs';
+
 
 dotenv.config();
 
