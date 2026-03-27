@@ -357,15 +357,25 @@ app.get('/api/stories/feed', async (req, res) => {
     const feedRes = await pool.query(`
       SELECT 
         p.username, p.name, p.avatar_url as avatar,
-        json_agg(json_build_object('id', s.id, 'image_url', s.image_url)) as stories
+        s.id, s.image_url
       FROM stories s
       JOIN profiles p ON s.email = p.email
       WHERE s.expires_at > NOW()
-      GROUP BY p.username, p.name, p.avatar_url
+      ORDER BY s.created_at DESC
     `);
-    res.json({ feed: feedRes.rows });
+    
+    // Group by user manually for reliability
+    const feedMap = {};
+    feedRes.rows.forEach(row => {
+      if (!feedMap[row.username]) {
+        feedMap[row.username] = { username: row.username, name: row.name, avatar: row.avatar, stories: [] };
+      }
+      feedMap[row.username].stories.push({ id: row.id, image_url: row.image_url });
+    });
+    
+    res.json({ feed: Object.values(feedMap) });
   } catch (err) {
-    console.error(err);
+    console.error("Feed Error Details:", err);
     res.status(500).json({ error: 'Failed to fetch stories feed' });
   }
 });

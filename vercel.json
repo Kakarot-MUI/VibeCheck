@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://vibecheck-eqip.onrender.com/api/:path*"
+    },
+    {
+      "source": "/stories/:path*",
+      "destination": "https://vibecheck-eqip.onrender.com/stories/:path*"
+    },
+    {
+      "source": "/u/:path*",
+      "destination": "/"
+    }
+  ]
+}

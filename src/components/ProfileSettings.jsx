@@ -107,6 +107,16 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
                  </div>
               </div>
 
+              <div className="share-section" style={{ background: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
+                 <label className="share-label">Dashboard Actions</label>
+                 <button type="button" className="glass-btn-accent" style={{ width: '100%', marginTop: '0.5rem' }} onClick={() => {
+                   onClose();
+                   document.getElementById('post-upload-input').click();
+                 }}>
+                   📸 Post a New Vibe
+                 </button>
+              </div>
+
               <div className="avatar-preview-section">
                 <div className="preview-container" onClick={triggerFilePicker}>
                   <div className="preview-circle">
