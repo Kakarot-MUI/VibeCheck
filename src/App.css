@@ -10,6 +10,39 @@
   gap: 1.5rem;
 }
 
+.search-trigger {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(15px);
+  padding: 0;
+}
+
+.search-trigger:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+.search-trigger svg {
+  opacity: 0.8;
+  transition: all 0.3s;
+}
+
+.search-trigger:hover svg {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 .app-header {
   display: flex;
   justify-content: center;

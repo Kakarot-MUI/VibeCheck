@@ -93,9 +93,20 @@ app.post('/api/auth/register', async (req, res) => {
 
     await pool.query('INSERT INTO users (email, password, name) VALUES ($1, $2, $3)', [email, password, name]);
     
-    // Generate unique ID (username)
+    // ENSURE username column exists (Migration)
+    await pool.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS username TEXT UNIQUE');
+
+    // Backfill: Ensure all existing users have a username
+    const missing = await pool.query('SELECT email, name FROM profiles WHERE username IS NULL');
+    for (const user of missing.rows) {
+      const base = user.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const unique = `${base}-${Math.random().toString(36).substring(2, 10)}`; // 8 digits
+      await pool.query('UPDATE profiles SET username = $1 WHERE email = $2', [unique, user.email]);
+    }
+
+    // Generate unique ID (username) - 8 DIGITS
     const baseUsername = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    let username = `${baseUsername}-${Math.random().toString(36).substring(2, 6)}`;
+    let username = `${baseUsername}-${Math.random().toString(36).substring(2, 10)}`;
     
     // Ensure username is unique (simple retry logic)
     let usernameExists = true;
@@ -105,7 +116,7 @@ app.post('/api/auth/register', async (req, res) => {
       if (existingUsername.rows.length === 0) {
         usernameExists = false;
       } else {
-        username = `${baseUsername}-${Math.random().toString(36).substring(2, 6)}`;
+        username = `${baseUsername}-${Math.random().toString(36).substring(2, 10)}`;
         attempts++;
       }
     }
@@ -261,10 +272,59 @@ app.get('/api/users/search', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Stories: Create
+app.post('/api/stories/create', async (req, res) => {
+  const { email, imageUrl } = req.body;
+  try {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+    
+    await pool.query(
+      'INSERT INTO stories (user_email, image_url, expires_at) VALUES ($1, $2, $3)',
+      [email, imageUrl, expiresAt]
+    );
+    res.json({ message: 'Story posted!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Stories: Get Feed (Active stories from everyone)
+app.get('/api/stories/feed', async (req, res) => {
+  try {
+    const storiesRes = await pool.query(`
+      SELECT s.*, p.name, p.username, p.avatar_url 
+      FROM stories s
+      JOIN profiles p ON s.user_email = p.email
+      WHERE s.expires_at > CURRENT_TIMESTAMP
+      ORDER BY s.created_at DESC
+    `);
+    
+    // Group by user
+    const feed = storiesRes.rows.reduce((acc, story) => {
+      if (!acc[story.username]) {
+        acc[story.username] = {
+          username: story.username,
+          name: story.name,
+          avatar: story.avatar_url,
+          stories: []
+        };
+      }
+      acc[story.username].stories.push(story);
+      return acc;
+    }, {});
+    
+    res.json({ feed: Object.values(feed) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  // Catch-all to serve index.html for SPA routing
+  // 3. Serve Frontend (Unified Hosting)
   app.use((req, res, next) => {
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
     if (req.method === 'GET' && !req.path.startsWith('/api') && isHtml) {
