@@ -18,9 +18,10 @@ const NowPlaying = ({ data }) => {
       <div className="music-content">
         <div className="album-art-container">
           <img 
-            src={data.albumArt} 
+            src={data.albumArt || "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"} 
             alt="Album Art" 
-            className={`album-art ${data.isPlaying ? 'spinning' : ''}`} 
+            className={`album-art ${data.isPlaying ? 'spinning' : ''}`}
+            onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"; e.target.onError = null; }}
           />
         </div>
         <div className="track-info">
