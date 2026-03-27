@@ -137,6 +137,11 @@ function App() {
           </header>
 
           <main className="app-container">
+            {globalState.profile.name === "Your Name Here" && (
+              <div className="setup-hint reveal-1">
+                <p>Welcome! Tap <span>Edit Hub</span> above to add your music and vibe. 🚀</p>
+              </div>
+            )}
             {/* Left Column - Profile & Core Info */}
             <div className="left-column reveal-2">
               <ProfileHeader profile={globalState.profile} />

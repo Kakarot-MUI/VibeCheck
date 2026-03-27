@@ -17,9 +17,37 @@
 }
 
 .app-container {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  display: flex;
   gap: 2rem;
+  padding: 2.5rem 0;
+  position: relative;
+}
+
+.setup-hint {
+  position: absolute;
+  top: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-primary);
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  white-space: nowrap;
+  animation: pulse-hint 2s infinite ease-in-out;
+}
+
+.setup-hint span {
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+@keyframes pulse-hint {
+  0%, 100% { transform: translateX(-50%) scale(1); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
+  50% { transform: translateX(-50%) scale(1.05); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
 }
 
 .left-column, .right-column {

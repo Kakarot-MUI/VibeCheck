@@ -43,8 +43,9 @@ const ThemeSwitcher = ({ onLogout, onOpenSettings }) => {
         </div>
       </GlassCard>
 
-      <button className="icon-btn" onClick={onOpenSettings} title="Profile Settings">
+      <button className="icon-btn settings-trigger" onClick={onOpenSettings} title="Profile Settings">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span className="btn-label">Edit Hub</span>
       </button>
 
       <button className="icon-btn logout" onClick={onLogout} title="Sign Out">

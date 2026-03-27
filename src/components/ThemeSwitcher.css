@@ -31,8 +31,34 @@
   transform: translateY(-3px) scale(1.1);
 }
 
+.icon-btn.settings-trigger {
+  background: var(--accent-primary);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  width: auto;
+  gap: 0.6rem;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.icon-btn.settings-trigger:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+}
+
+.btn-label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.icon-btn.logout {
+  opacity: 0.7;
+}
+
 .icon-btn.logout:hover {
-  color: #f43f5e;
+  opacity: 1;
+  color: var(--status-offline);
   border-color: #f43f5e;
   box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
 }
