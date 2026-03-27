@@ -119,17 +119,24 @@ function App() {
     setGlobalState(vibeConfigData);
   };
 
-  const handleAddStory = async () => {
-    const url = prompt("Enter Image URL for your Story (e.g., from Unsplash or Imgur):");
-    if (url && userEmail) {
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file && userEmail) {
       try {
-        await api.createStory(userEmail, url);
-        alert("Vibe Posted! ✨ (It will appear in the feed shortly)");
+        setLoading(true);
+        await api.uploadStory(userEmail, file);
+        alert("Vibe Posted! ✨ (Your story is live)");
         window.location.reload(); 
       } catch (err) {
         alert("Failed to post story: " + err.message);
+      } finally {
+        setLoading(false);
       }
     }
+  };
+
+  const handleAddStory = () => {
+    document.getElementById('story-upload-input').click();
   };
 
   const updateGlobalState = async (newData) => {
@@ -240,6 +247,14 @@ function App() {
               onClose={() => setViewingStories(null)} 
             />
           )}
+
+          <input 
+            type="file" 
+            id="story-upload-input" 
+            style={{ display: 'none' }} 
+            accept="image/*"
+            onChange={handleFileChange}
+          />
         </div>
       )}
     </>

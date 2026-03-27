@@ -72,5 +72,17 @@ export const api = {
     });
     if (!res.ok) throw new Error('Failed to post story');
     return res.json();
+  },
+  uploadStory: async (email, file) => {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('image', file);
+
+    const res = await fetch(`${API_URL}/stories/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!res.ok) throw new Error('Photo upload failed');
+    return res.json();
   }
 };

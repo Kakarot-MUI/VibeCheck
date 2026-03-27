@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import multer from 'multer';
 import pg from 'pg';
 import dotenv from 'dotenv';
 import fs from 'fs';
@@ -279,6 +281,28 @@ app.get('/api/users/search', async (req, res) => {
 });
 
 // Stories: Create
+// NATIVE STORY UPLOAD
+app.post('/api/stories/upload', upload.single('image'), async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const imageUrl = `/stories/${req.file.filename}`;
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await pool.query(
+      'INSERT INTO stories (email, image_url, expires_at) VALUES ($1, $2, $3)',
+      [email, imageUrl, expiresAt]
+    );
+
+    res.json({ success: true, imageUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
+// LEGACY (REMAINING COMPATIBLE)
 app.post('/api/stories/create', async (req, res) => {
   const { email, imageUrl } = req.body;
   try {
