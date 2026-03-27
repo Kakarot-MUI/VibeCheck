@@ -93,9 +93,31 @@ app.post('/api/auth/register', async (req, res) => {
 
     await pool.query('INSERT INTO users (email, password, name) VALUES ($1, $2, $3)', [email, password, name]);
     
+    // Generate unique ID (username)
+    const baseUsername = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    let username = `${baseUsername}-${Math.random().toString(36).substring(2, 6)}`;
+    
+    // Ensure username is unique (simple retry logic)
+    let usernameExists = true;
+    let attempts = 0;
+    while (usernameExists && attempts < 5) { // Limit attempts to prevent infinite loop
+      const existingUsername = await pool.query('SELECT 1 FROM profiles WHERE username = $1', [username]);
+      if (existingUsername.rows.length === 0) {
+        usernameExists = false;
+      } else {
+        username = `${baseUsername}-${Math.random().toString(36).substring(2, 6)}`;
+        attempts++;
+      }
+    }
+    if (usernameExists) {
+      // Fallback if unique username couldn't be generated
+      username = `${baseUsername}-${Date.now().toString().slice(-5)}`;
+    }
+
     // Initialize profile
     const defaultProfile = {
       name,
+      username, // Add username here
       bio: "New to VibeCheck! 👋",
       avatar_url: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
       mood_vibe: "Fresh Start ✨",
@@ -110,12 +132,12 @@ app.post('/api/auth/register', async (req, res) => {
 
     await pool.query(`
       INSERT INTO profiles (
-        email, name, bio, avatar_url, mood_vibe, mood_color, 
+        email, name, username, bio, avatar_url, mood_vibe, mood_color, 
         now_playing_title, now_playing_artist, now_playing_album_art, 
         now_playing_is_playing, photo_widget_text, links
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     `, [
-      email, defaultProfile.name, defaultProfile.bio, defaultProfile.avatar_url,
+      email, defaultProfile.name, defaultProfile.username, defaultProfile.bio, defaultProfile.avatar_url,
       defaultProfile.mood_vibe, defaultProfile.mood_color, defaultProfile.now_playing_title,
       defaultProfile.now_playing_artist, defaultProfile.now_playing_album_art,
       defaultProfile.now_playing_is_playing, defaultProfile.photo_widget_text, defaultProfile.links
