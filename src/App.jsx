@@ -211,6 +211,11 @@ function App() {
                   onLogout={handleLogout} 
                   onOpenSettings={() => setIsSettingsOpen(true)} 
                 />
+                {!isPublicView && (
+                  <button className="glass-btn-accent" onClick={handleAddPost}>
+                    Post Vibe
+                  </button>
+                )}
               </div>
             ) : (
               <div className="viewer-controls">
@@ -241,6 +246,10 @@ function App() {
                 <ProfileHeader profile={globalState.profile} />
                 <MoodBadge mood={globalState.mood} />
                 <ClockWidget />
+                <PostsGrid 
+                  username={globalState.profile.username} 
+                  refreshTrigger={refreshPosts} 
+                />
               </div>
 
               {/* Right Column - Media & Socials */}

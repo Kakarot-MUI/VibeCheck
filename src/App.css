@@ -43,6 +43,26 @@
   transform: scale(1.1);
 }
 
+.glass-btn-accent {
+  background: linear-gradient(135deg, var(--accent-primary), #6366f1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.glass-btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+  filter: brightness(1.1);
+}
+
 .app-header {
   display: flex;
   justify-content: center;
