@@ -13,10 +13,13 @@ const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Database Configuration
-// Use DATABASE_URL from Render, or fallback to a local string for dev
+if (!process.env.DATABASE_URL) {
+  console.warn("⚠️ DATABASE_URL is not set. Database features will fail.");
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  ssl: { rejectUnauthorized: false } // Force SSL for Render
 });
 
 app.use(cors());
@@ -53,13 +56,23 @@ const initDb = async () => {
       )
     `);
     client.release();
-    console.log("PostgreSQL Tables Synced 🚀");
+    console.log("✅ PostgreSQL Tables Synced & Connected 🚀");
   } catch (err) {
-    console.error("DB Init Error:", err);
+    console.error("❌ DB Init Error:", err.message);
   }
 };
 
 initDb();
+
+// Test Route
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const dbRes = await pool.query('SELECT NOW()');
+    res.json({ status: 'connected', time: dbRes.rows[0].now });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
 
 // 2. API Routes
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
