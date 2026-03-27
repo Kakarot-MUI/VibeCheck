@@ -254,7 +254,10 @@ function App() {
 
               {/* Right Column - Media & Socials */}
               <div className="right-column reveal-3">
-                <NowPlaying data={globalState.nowPlaying} />
+                <NowPlaying 
+                  data={globalState.nowPlaying} 
+                  musicUrl={globalState.musicUrl} 
+                />
                 <PhotoWidget text={globalState.photoWidgetText} />
                 <SocialDock links={globalState.links} />
               </div>

@@ -87,9 +87,13 @@ const initDb = async () => {
         now_playing_is_playing BOOLEAN,
         photo_widget_text TEXT,
         links JSONB,
-        username TEXT UNIQUE
+        username TEXT UNIQUE,
+        music_url TEXT
       )
     `);
+
+    // Migration for existing tables
+    await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS music_url TEXT');
 
     // Create Stories table
     await client.query(`
@@ -259,13 +263,14 @@ app.post('/api/profile/update', async (req, res) => {
         mood_vibe = $4, mood_color = $5, 
         now_playing_title = $6, now_playing_artist = $7, now_playing_album_art = $8, 
         now_playing_is_playing = $9, photo_widget_text = $10,
-        links = $11
-      WHERE email = $12
+        links = $11, music_url = $12
+      WHERE email = $13
     `, [
       profile.name, profile.bio, profile.avatarUrl,
       mood.vibe, mood.color,
       nowPlaying.title, nowPlaying.artist, nowPlaying.albumArt,
-      nowPlaying.isPlaying, photoWidgetText, JSON.stringify(links), email
+      nowPlaying.isPlaying, photoWidgetText, JSON.stringify(links), 
+      profileData.musicUrl || '', email
     ]);
 
     // Fetch updated profile to return

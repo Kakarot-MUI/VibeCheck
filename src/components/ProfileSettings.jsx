@@ -16,6 +16,7 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
   const [photoWidgetText, setPhotoWidgetText] = useState(state.photoWidgetText || "");
   // Social Links State
   const [links, setLinks] = useState(state.links || []);
+  const [musicUrl, setMusicUrl] = useState(state.musicUrl || "");
 
   const fileInputRef = useRef(null);
 
@@ -44,7 +45,8 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
       mood, 
       nowPlaying: { ...nowPlaying, isPlaying: nowPlaying.title !== "No music playing" }, 
       photoWidgetText,
-      links
+      links,
+      musicUrl
     });
     onClose();
   };
@@ -175,6 +177,17 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
               <div className="setting-item">
                 <label>Album Art URL</label>
                 <input type="text" value={nowPlaying.albumArt} onChange={(e) => setNowPlaying({...nowPlaying, albumArt: e.target.value})} className="glass-input" placeholder="https://..." />
+              </div>
+              <div className="setting-item" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                <label>Interactive Player Link (Spotify/YouTube)</label>
+                <input 
+                  type="text" 
+                  value={musicUrl} 
+                  onChange={(e) => setMusicUrl(e.target.value)} 
+                  className="glass-input" 
+                  placeholder="https://open.spotify.com/track/..."
+                />
+                <p className="input-hint">Paste a link to enable the playable player in your hub!</p>
               </div>
             </div>
           )}
