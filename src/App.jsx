@@ -13,6 +13,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import ForgotPassword from './components/ForgotPassword';
 import ProfileSettings from './components/ProfileSettings';
+import SearchOverlay from './components/SearchOverlay';
 import { api } from './services/api';
 import './App.css';
 
@@ -23,6 +24,7 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isPublicView, setIsPublicView] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Persistence: Fetch profile on mount
   useEffect(() => {
@@ -155,10 +157,15 @@ function App() {
         <div className="app-layout">
           <header className="app-header reveal-1">
             {!isPublicView ? (
-              <ThemeSwitcher 
-                onLogout={handleLogout} 
-                onOpenSettings={() => setIsSettingsOpen(true)} 
-              />
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <button className="search-trigger" onClick={() => setIsSearchOpen(true)}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+                <ThemeSwitcher 
+                  onLogout={handleLogout} 
+                  onOpenSettings={() => setIsSettingsOpen(true)} 
+                />
+              </div>
             ) : (
               <div className="viewer-controls">
                 <button className="back-btn" onClick={() => window.location.href = '/'}>Create Your Own Vibe</button>
@@ -193,6 +200,10 @@ function App() {
               onSave={updateGlobalState} 
               onClose={() => setIsSettingsOpen(false)} 
             />
+          )}
+
+          {isSearchOpen && (
+            <SearchOverlay onClose={() => setIsSearchOpen(false)} />
           )}
         </div>
       )}
