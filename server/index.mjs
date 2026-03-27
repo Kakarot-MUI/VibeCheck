@@ -105,7 +105,11 @@ const initDb = async () => {
     `);
 
     // Migration for existing tables
-    await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS music_url TEXT');
+    try {
+      await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS music_url TEXT');
+    } catch (migErr) {
+      console.warn("⚠️ Migration Note (music_url):", migErr.message);
+    }
 
     // Create Stories table
     await client.query(`
