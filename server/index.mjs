@@ -101,23 +101,23 @@ app.post('/api/auth/register', async (req, res) => {
     const missing = await pool.query('SELECT email, name FROM profiles WHERE username IS NULL');
     for (const user of missing.rows) {
       const base = user.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      const unique = `${base}-${Math.random().toString(36).substring(2, 10)}`; // 8 digits
+      const unique = `${base}-${Math.floor(10000000 + Math.random() * 90000000)}`; // 8 NUMERIC digits
       await pool.query('UPDATE profiles SET username = $1 WHERE email = $2', [unique, user.email]);
     }
 
-    // Generate unique ID (username) - 8 DIGITS
+    // Generate unique ID (username) - 8 NUMERIC DIGITS
     const baseUsername = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    let username = `${baseUsername}-${Math.random().toString(36).substring(2, 10)}`;
+    let username = `${baseUsername}-${Math.floor(10000000 + Math.random() * 90000000)}`;
     
     // Ensure username is unique (simple retry logic)
     let usernameExists = true;
     let attempts = 0;
-    while (usernameExists && attempts < 5) { // Limit attempts to prevent infinite loop
+    while (usernameExists && attempts < 5) {
       const existingUsername = await pool.query('SELECT 1 FROM profiles WHERE username = $1', [username]);
       if (existingUsername.rows.length === 0) {
         usernameExists = false;
       } else {
-        username = `${baseUsername}-${Math.random().toString(36).substring(2, 10)}`;
+        username = `${baseUsername}-${Math.floor(10000000 + Math.random() * 90000000)}`;
         attempts++;
       }
     }

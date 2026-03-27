@@ -10,10 +10,16 @@ const SearchOverlay = ({ onClose }) => {
 
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
-      if (query.trim().length > 1) {
+      let cleanQuery = query.trim();
+      // Smart Detect: If it's a VibeCheck URL, strip everything except the username
+      if (cleanQuery.includes('/u/')) {
+        cleanQuery = cleanQuery.split('/u/')[1] || cleanQuery;
+      }
+
+      if (cleanQuery.length > 1) {
         setSearching(true);
         try {
-          const res = await api.searchUsers(query);
+          const res = await api.searchUsers(cleanQuery);
           setResults(res.results);
         } catch (err) {
           console.error("Search error:", err);
