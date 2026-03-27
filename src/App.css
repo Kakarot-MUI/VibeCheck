@@ -51,9 +51,21 @@
 
 .app-container {
   display: flex;
-  gap: 2rem;
-  padding: 2.5rem 0;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
   position: relative;
+}
+
+.stories-wrapper {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.main-content-row {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
 }
 
 .setup-hint {
