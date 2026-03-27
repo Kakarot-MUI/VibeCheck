@@ -20,7 +20,8 @@ const ClockWidget = () => {
         fontWeight: 800, 
         letterSpacing: '2px',
         color: 'var(--text-main)',
-        textShadow: '0 0 20px var(--accent-primary)'
+        textShadow: '0 0 20px var(--accent-primary)',
+        fontVariantNumeric: 'tabular-nums'
       }}>
         {timeString}
       </div>
