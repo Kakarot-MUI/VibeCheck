@@ -133,6 +133,17 @@ const initDb = async () => {
       )
     `);
 
+    // Create Followers table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS followers (
+        id SERIAL PRIMARY KEY,
+        follower_email TEXT REFERENCES users(email),
+        following_email TEXT REFERENCES users(email),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(follower_email, following_email)
+      )
+    `);
+
     client.release();
     console.log("✅ PostgreSQL Tables Synced & Connected 🚀");
   } catch (err) {
@@ -439,6 +450,84 @@ app.get('/api/posts/:username', async (req, res) => {
   }
 });
 
+
+// FOLLOW SYSTEM: Follow
+app.post('/api/follow', async (req, res) => {
+  const { followerEmail, targetUsername } = req.body;
+  try {
+    const target = await pool.query('SELECT email FROM profiles WHERE username = $1', [targetUsername]);
+    if (target.rows.length === 0) return res.status(404).json({ error: 'Target user not found' });
+    const followingEmail = target.rows[0].email;
+
+    if (followerEmail === followingEmail) return res.status(400).json({ error: "Cannot follow yourself" });
+    
+    await pool.query(
+      'INSERT INTO followers (follower_email, following_email) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+      [followerEmail, followingEmail]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// FOLLOW SYSTEM: Unfollow
+app.post('/api/unfollow', async (req, res) => {
+  const { followerEmail, targetUsername } = req.body;
+  try {
+    const target = await pool.query('SELECT email FROM profiles WHERE username = $1', [targetUsername]);
+    if (target.rows.length === 0) return res.status(404).json({ error: 'Target user not found' });
+    const followingEmail = target.rows[0].email;
+
+    await pool.query(
+      'DELETE FROM followers WHERE follower_email = $1 AND following_email = $2',
+      [followerEmail, followingEmail]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// FOLLOW SYSTEM: Status
+app.get('/api/follow/status/:meEmail/:targetUsername', async (req, res) => {
+  const { meEmail, targetUsername } = req.params;
+  try {
+    const target = await pool.query('SELECT email FROM profiles WHERE username = $1', [targetUsername]);
+    if (target.rows.length === 0) return res.json({ following: false });
+    const followingEmail = target.rows[0].email;
+
+    const statusRes = await pool.query(
+      'SELECT 1 FROM followers WHERE follower_email = $1 AND following_email = $2',
+      [meEmail, followingEmail]
+    );
+    res.json({ following: statusRes.rows.length > 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// FOLLOW SYSTEM: Counts
+app.get('/api/follow/counts/:username', async (req, res) => {
+  const { username } = req.params;
+  try {
+    // We need the email for the username first
+    const userRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [username]);
+    if (userRes.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    
+    const email = userRes.rows[0].email;
+    
+    const followersCount = await pool.query('SELECT COUNT(*) FROM followers WHERE following_email = $1', [email]);
+    const followingCount = await pool.query('SELECT COUNT(*) FROM followers WHERE follower_email = $1', [email]);
+    
+    res.json({
+      followers: parseInt(followersCount.rows[0].count),
+      following: parseInt(followingCount.rows[0].count)
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {

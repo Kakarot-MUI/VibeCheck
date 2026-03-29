@@ -23,6 +23,7 @@ import './App.css';
 function App() {
   const [currentView, setCurrentView] = useState('login'); 
   const [userEmail, setUserEmail] = useState(localStorage.getItem('vibe_email') || null);
+  const [myUsername, setMyUsername] = useState(localStorage.getItem('vibe_username') || null);
   const [globalState, setGlobalState] = useState(vibeConfigData);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,8 @@ function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [viewingStories, setViewingStories] = useState(null);
   const [refreshPosts, setRefreshPosts] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
 
   // Persistence: Fetch profile on mount
   useEffect(() => {
@@ -44,6 +47,15 @@ function App() {
             setGlobalState(res.profile);
             setIsPublicView(true);
             setCurrentView('dashboard');
+            
+            // NEW: Fetch Follow Stats & Status
+            const counts = await api.getFollowCounts(username);
+            setFollowStats(counts);
+            const meEmail = localStorage.getItem('vibe_email');
+            if (meEmail) {
+              const status = await api.getFollowStatus(meEmail, username);
+              setIsFollowing(status.following);
+            }
           } catch (err) {
             console.error("Public profile not found:", err);
             setCurrentView('login');
@@ -69,7 +81,13 @@ function App() {
       // (In a real app, this would be a /profile/me route with a JWT)
       const res = await api.login(email, localStorage.getItem('vibe_temp_pass')); 
       setGlobalState(res.profile);
+      setMyUsername(res.profile.profile.username);
+      localStorage.setItem('vibe_username', res.profile.profile.username);
       setCurrentView('dashboard');
+
+      // NEW: Fetch my own stats
+      const counts = await api.getFollowCounts(res.profile.profile.username);
+      setFollowStats(counts);
     } catch (err) {
       console.error("Session expired or server down:", err);
       localStorage.removeItem('vibe_email');
@@ -84,7 +102,9 @@ function App() {
       const res = await api.login(email, password);
       setUserEmail(email);
       setGlobalState(res.profile);
+      setMyUsername(res.profile.profile.username);
       localStorage.setItem('vibe_email', email);
+      localStorage.setItem('vibe_username', res.profile.profile.username);
       localStorage.setItem('vibe_temp_pass', password); // Temporary for demo without JWT
       setCurrentView('dashboard');
     } catch (err) {
@@ -115,8 +135,10 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('vibe_email');
+    localStorage.removeItem('vibe_username');
     localStorage.removeItem('vibe_temp_pass');
     setUserEmail(null);
+    setMyUsername(null);
     setCurrentView('login');
     setGlobalState(vibeConfigData);
   };
@@ -168,6 +190,29 @@ function App() {
       setGlobalState(res.profile);
     } catch (err) {
       alert("Failed to save to database: " + err.message);
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    if (!userEmail) {
+      alert("Please login to follow users! 🚀");
+      setCurrentView('login');
+      return;
+    }
+
+    const targetUsername = globalState.profile.username;
+    try {
+      if (isFollowing) {
+        await api.unfollowUser(userEmail, targetUsername);
+        setIsFollowing(false);
+        setFollowStats(prev => ({ ...prev, followers: prev.followers - 1 }));
+      } else {
+        await api.followUser(userEmail, targetUsername);
+        setIsFollowing(true);
+        setFollowStats(prev => ({ ...prev, followers: prev.followers + 1 }));
+      }
+    } catch (err) {
+      console.error("Toggle follow error:", err);
     }
   };
 
@@ -243,7 +288,15 @@ function App() {
             <div className="main-content-row">
               {/* Left Column - Profile & Core Info */}
               <div className="left-column reveal-2">
-                <ProfileHeader profile={globalState.profile} />
+                <ProfileHeader 
+                  profile={globalState.profile} 
+                  isPublicView={isPublicView}
+                  isFollowing={isFollowing}
+                  followStats={followStats}
+                  onToggleFollow={handleToggleFollow}
+                  currentUserId={userEmail}
+                  isOwnProfile={myUsername === globalState.profile.username}
+                />
                 <MoodBadge mood={globalState.mood} />
                 <ClockWidget />
                 <PostsGrid 

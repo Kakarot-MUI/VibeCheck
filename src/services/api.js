@@ -102,5 +102,33 @@ export const api = {
     const res = await fetch(`${API_URL}/posts/${username}`);
     if (!res.ok) throw new Error('Failed to fetch posts');
     return res.json();
+  },
+  followUser: async (followerEmail, targetUsername) => {
+    const res = await fetch(`${API_URL}/follow`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ followerEmail, targetUsername })
+    });
+    if (!res.ok) throw new Error('Follow failed');
+    return res.json();
+  },
+  unfollowUser: async (followerEmail, targetUsername) => {
+    const res = await fetch(`${API_URL}/unfollow`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ followerEmail, targetUsername })
+    });
+    if (!res.ok) throw new Error('Unfollow failed');
+    return res.json();
+  },
+  getFollowStatus: async (meEmail, targetUsername) => {
+    const res = await fetch(`${API_URL}/follow/status/${meEmail}/${targetUsername}`);
+    if (!res.ok) throw new Error('Failed to fetch follow status');
+    return res.json();
+  },
+  getFollowCounts: async (username) => {
+    const res = await fetch(`${API_URL}/follow/counts/${username}`);
+    if (!res.ok) throw new Error('Failed to fetch follow counts');
+    return res.json();
   }
 };
