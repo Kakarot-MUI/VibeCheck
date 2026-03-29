@@ -126,15 +126,9 @@
 }
 
 .follow-btn.following:hover {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.3);
   color: #ff4d4d;
-}
-
-.follow-btn.following:hover::after {
-  content: " (Unfollow?)";
-  font-size: 0.7rem;
-  opacity: 0.7;
 }
 
 .bio {
