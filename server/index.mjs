@@ -108,8 +108,9 @@ const initDb = async () => {
     // Migration for existing tables
     try {
       await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS music_url TEXT');
+      await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS theme_name TEXT DEFAULT \'Cyberpunk\'');
     } catch (migErr) {
-      console.warn("⚠️ Migration Note (music_url):", migErr.message);
+      console.warn("⚠️ Migration Note (schema updates):", migErr.message);
     }
 
     // Create Stories table
