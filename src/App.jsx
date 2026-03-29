@@ -195,6 +195,32 @@ function App() {
     }
   };
 
+  const handleDeleteMusic = async () => {
+    if (!window.confirm("Clear your Music Hub? 🎵")) return;
+    
+    // We send the new structure directly to the update function
+    const updatedData = {
+      ...globalState,
+      nowPlaying: { 
+        title: "", 
+        artist: "", 
+        albumArt: "", 
+        isPlaying: false 
+      },
+      musicUrl: ""
+    };
+
+    try {
+      setLoading(true);
+      await updateGlobalState(updatedData);
+      alert("Music Hub Cleared! ✨");
+    } catch (err) {
+      alert("Failed to clear music: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleToggleFollow = async () => {
     if (!userEmail) {
       alert("Please login to follow users! 🚀");
@@ -314,6 +340,8 @@ function App() {
                 <NowPlaying 
                   data={globalState.nowPlaying} 
                   musicUrl={globalState.musicUrl} 
+                  isOwnProfile={myUsername === globalState.profile.username}
+                  onDelete={handleDeleteMusic}
                 />
                 <PhotoWidget text={globalState.photoWidgetText} />
                 <SocialDock links={globalState.links} />

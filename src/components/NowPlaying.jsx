@@ -2,7 +2,7 @@ import { useState } from 'react';
 import GlassCard from './GlassCard';
 import './NowPlaying.css';
 
-const NowPlaying = ({ data, musicUrl }) => {
+const NowPlaying = ({ data, musicUrl, isOwnProfile, onDelete }) => {
   const [isPlayerView, setIsPlayerView] = useState(false);
   if (!data) return null;
 
@@ -23,11 +23,22 @@ const NowPlaying = ({ data, musicUrl }) => {
 
   const embedUrl = getEmbedUrl(musicUrl);
 
+  const hasMusic = data.title || musicUrl;
+
   return (
     <GlassCard className="now-playing">
       <div className="music-header">
         <span className="music-label">NOW PLAYING</span>
-        <div className="header-right" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="header-right" style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+          {isOwnProfile && hasMusic && (
+            <button 
+              className="delete-music-btn" 
+              onClick={() => onDelete && onDelete()}
+              title="Clear Music Hub"
+            >
+              ✕
+            </button>
+          )}
           {embedUrl && (
             <button 
               type="button"
