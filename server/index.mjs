@@ -630,6 +630,38 @@ app.get('/api/follow/status/:meEmail/:targetUsername', async (req, res) => {
   }
 });
 
+// FOLLOW SYSTEM: List (Followers or Following)
+app.get('/api/follow/list/:username', async (req, res) => {
+  const { username } = req.params;
+  const { type } = req.query; // 'followers' or 'following'
+  try {
+    const userRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [username]);
+    if (userRes.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    const userEmail = userRes.rows[0].email;
+
+    let listRes;
+    if (type === 'followers') {
+      listRes = await pool.query(`
+        SELECT p.name, p.username, p.avatar_url
+        FROM followers f
+        JOIN profiles p ON f.follower_email = p.email
+        WHERE f.following_email = $1
+      `, [userEmail]);
+    } else {
+      listRes = await pool.query(`
+        SELECT p.name, p.username, p.avatar_url
+        FROM followers f
+        JOIN profiles p ON f.following_email = p.email
+        WHERE f.follower_email = $1
+      `, [userEmail]);
+    }
+
+    res.json({ users: listRes.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // FOLLOW SYSTEM: Counts
 app.get('/api/follow/counts/:username', async (req, res) => {
   const { username } = req.params;

@@ -2,7 +2,7 @@ import vibeConfig from '../vibe-config.json';
 import GlassCard from './GlassCard';
 import './ProfileHeader.css';
 
-const ProfileHeader = ({ profile, isPublicView, isFollowing, followStats, onToggleFollow, currentUserId, isOwnProfile }) => {
+const ProfileHeader = ({ profile, isPublicView, isFollowing, followStats, onToggleFollow, onShowFollowers, onShowFollowing, currentUserId, isOwnProfile }) => {
   const displayProfile = profile || vibeConfig.profile;
   const showFollowButton = isPublicView && !isOwnProfile;
 
@@ -15,11 +15,11 @@ const ProfileHeader = ({ profile, isPublicView, isFollowing, followStats, onTogg
         </div>
         
         <div className="profile-stats">
-          <div className="stat-item">
+          <div className="stat-item clickable" onClick={() => onShowFollowers && onShowFollowers()}>
             <span className="stat-value">{followStats?.followers || 0}</span>
             <span className="stat-label">Followers</span>
           </div>
-          <div className="stat-item">
+          <div className="stat-item clickable" onClick={() => onShowFollowing && onShowFollowing()}>
             <span className="stat-value">{followStats?.following || 0}</span>
             <span className="stat-label">Following</span>
           </div>

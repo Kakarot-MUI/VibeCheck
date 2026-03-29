@@ -17,6 +17,7 @@ import SearchOverlay from './components/SearchOverlay';
 import StoriesBar from './components/StoriesBar';
 import StoryViewer from './components/StoryViewer';
 import PostsGrid from './components/PostsGrid';
+import FollowListModal from './components/FollowListModal';
 import { api } from './services/api';
 import './App.css';
 
@@ -33,6 +34,7 @@ function App() {
   const [refreshPosts, setRefreshPosts] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
+  const [showFollowList, setShowFollowList] = useState(null); // { type: 'followers' | 'following', username: string }
 
   // Persistence: Fetch profile on mount
   useEffect(() => {
@@ -294,6 +296,8 @@ function App() {
                   isFollowing={isFollowing}
                   followStats={followStats}
                   onToggleFollow={handleToggleFollow}
+                  onShowFollowers={() => setShowFollowList({ type: 'followers', username: globalState.profile.username })}
+                  onShowFollowing={() => setShowFollowList({ type: 'following', username: globalState.profile.username })}
                   currentUserId={userEmail}
                   isOwnProfile={myUsername === globalState.profile.username}
                 />
@@ -327,6 +331,14 @@ function App() {
 
           {isSearchOpen && (
             <SearchOverlay onClose={() => setIsSearchOpen(false)} />
+          )}
+
+          {showFollowList && (
+            <FollowListModal 
+              username={showFollowList.username} 
+              type={showFollowList.type} 
+              onClose={() => setShowFollowList(null)} 
+            />
           )}
 
           {viewingStories && (

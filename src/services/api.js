@@ -181,5 +181,10 @@ export const api = {
     const res = await fetch(`${API_URL}/follow/counts/${username}`);
     if (!res.ok) throw new Error('Failed to fetch follow counts');
     return res.json();
+  },
+  getFollowList: async (username, type) => {
+    const res = await fetch(`${API_URL}/follow/list/${username}?type=${type}`);
+    if (!res.ok) throw new Error('Failed to fetch follow list');
+    return res.json();
   }
 };
