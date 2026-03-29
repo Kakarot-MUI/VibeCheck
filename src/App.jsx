@@ -196,9 +196,7 @@ function App() {
   };
 
   const handleDeleteMusic = async () => {
-    if (!window.confirm("Clear your Music Hub? 🎵")) return;
-    
-    // We send the new structure directly to the update function
+    // Creating the reset structure
     const updatedData = {
       ...globalState,
       nowPlaying: { 
@@ -212,9 +210,11 @@ function App() {
 
     try {
       setLoading(true);
+      console.log("Clearing Music Hub...", updatedData);
       await updateGlobalState(updatedData);
       alert("Music Hub Cleared! ✨");
     } catch (err) {
+      console.error("Delete Music Error:", err);
       alert("Failed to clear music: " + err.message);
     } finally {
       setLoading(false);
