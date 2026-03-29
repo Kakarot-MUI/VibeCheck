@@ -98,6 +98,28 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+.minimal-yt {
+  height: 85px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.minimal-yt iframe {
+  position: absolute;
+  top: -35px; /* Crops the top portion (video) to reveal controls and title */
+  left: 0;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.minimal-spotify {
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .delete-music-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -114,10 +136,28 @@
   opacity: 0.6;
 }
 
+.delete-music-btn-header {
+   margin-right: 8px;
+}
+
 .delete-music-btn:hover {
   background: rgba(239, 68, 68, 0.15);
   border-color: rgba(239, 68, 68, 0.3);
   color: #ff4d4d;
   transform: scale(1.1);
   opacity: 1;
+}
+
+/* Glassmorphic scrollbar for the modal lists elsewhere if needed */
+.follow-list-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.follow-list-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.follow-list-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }

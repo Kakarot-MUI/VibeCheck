@@ -22,8 +22,10 @@ const NowPlaying = ({ data, musicUrl, isOwnProfile, onDelete }) => {
   };
 
   const embedUrl = getEmbedUrl(musicUrl);
+  const isSpotify = musicUrl?.includes('spotify.com');
+  const playerHeight = isSpotify ? "80" : "152";
 
-  const hasMusic = data.title || musicUrl;
+  const hasMusic = (data.title && data.title !== "") || (musicUrl && musicUrl !== "");
 
   return (
     <GlassCard className="now-playing">
@@ -33,7 +35,10 @@ const NowPlaying = ({ data, musicUrl, isOwnProfile, onDelete }) => {
           {isOwnProfile && hasMusic && (
             <button 
               className="delete-music-btn" 
-              onClick={() => onDelete && onDelete()}
+              onClick={(e) => {
+                e.preventDefault();
+                onDelete && onDelete();
+              }}
               title="Clear Music Hub"
             >
               ✕
@@ -66,11 +71,11 @@ const NowPlaying = ({ data, musicUrl, isOwnProfile, onDelete }) => {
       </div>
       
       {isPlayerView && embedUrl ? (
-        <div className="player-embed-container" style={{ marginTop: '1rem' }}>
+        <div className={`player-embed-container ${!isSpotify ? 'minimal-yt' : 'minimal-spotify'}`} style={{ marginTop: '1rem' }}>
           <iframe 
             src={embedUrl} 
             width="100%" 
-            height="152" 
+            height={playerHeight} 
             frameBorder="0" 
             allowtransparency="true" 
             allow="encrypted-media"
