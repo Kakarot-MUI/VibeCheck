@@ -9,19 +9,7 @@ const themes = [
   { name: 'Arctic', primary: '#06b6d4', secondary: '#a855f7' }
 ];
 
-const ThemeSwitcher = ({ onLogout, onOpenSettings }) => {
-  const [activeTheme, setActiveTheme] = useState(themes[0]);
-
-  const setTheme = (theme) => {
-    setActiveTheme(theme);
-    document.documentElement.style.setProperty('--accent-primary', theme.primary);
-    document.documentElement.style.setProperty('--accent-secondary', theme.secondary);
-    const r = parseInt(theme.primary.slice(1, 3), 16);
-    const g = parseInt(theme.primary.slice(3, 5), 16);
-    const b = parseInt(theme.primary.slice(5, 7), 16);
-    document.documentElement.style.setProperty('--cursor-glow-color', `rgba(${r}, ${g}, ${b}, 0.15)`);
-  };
-
+const ThemeSwitcher = ({ activeThemeName, onThemeChange, onLogout, onOpenSettings }) => {
   return (
     <div className="header-controls">
       <GlassCard className="theme-switcher" style={{ borderRadius: '50px', padding: '0.5rem 1rem' }}>
@@ -29,8 +17,8 @@ const ThemeSwitcher = ({ onLogout, onOpenSettings }) => {
           {themes.map((theme) => (
             <button
               key={theme.name}
-              className={`theme-btn ${activeTheme.name === theme.name ? 'active' : ''}`}
-              onClick={() => setTheme(theme)}
+              className={`theme-btn ${activeThemeName === theme.name ? 'active' : ''}`}
+              onClick={() => onThemeChange && onThemeChange(theme.name)}
               title={theme.name}
             >
               <div className="color-dots">

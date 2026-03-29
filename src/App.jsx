@@ -36,6 +36,28 @@ function App() {
   const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
   const [showFollowList, setShowFollowList] = useState(null); // { type: 'followers' | 'following', username: string }
 
+  const themes = [
+    { name: 'Cyberpunk', primary: '#8b5cf6', secondary: '#0ea5e9' },
+    { name: 'Emerald', primary: '#10b981', secondary: '#3b82f6' },
+    { name: 'Midnight', primary: '#f43f5e', secondary: '#fb923c' },
+    { name: 'Arctic', primary: '#06b6d4', secondary: '#a855f7' }
+  ];
+
+  // Theme synchronization effect
+  useEffect(() => {
+    const themeName = globalState.theme_name || 'Cyberpunk';
+    const theme = themes.find(t => t.name === themeName) || themes[0];
+    
+    document.documentElement.style.setProperty('--accent-primary', theme.primary);
+    document.documentElement.style.setProperty('--accent-secondary', theme.secondary);
+    
+    // Update cursor glow color
+    const r = parseInt(theme.primary.slice(1, 3), 16);
+    const g = parseInt(theme.primary.slice(3, 5), 16);
+    const b = parseInt(theme.primary.slice(5, 7), 16);
+    document.documentElement.style.setProperty('--cursor-glow-color', `rgba(${r}, ${g}, ${b}, 0.15)`);
+  }, [globalState.theme_name]);
+
   // Persistence: Fetch profile on mount
   useEffect(() => {
     const checkRoute = async () => {
@@ -221,6 +243,17 @@ function App() {
     }
   };
 
+  const handleThemeChange = (themeName) => {
+    if (isPublicView) return; // Visitors can't change the theme permanently
+    
+    const updatedData = {
+      ...globalState,
+      theme_name: themeName
+    };
+
+    updateGlobalState(updatedData);
+  };
+
   const handleToggleFollow = async () => {
     if (!userEmail) {
       alert("Please login to follow users! 🚀");
@@ -281,6 +314,8 @@ function App() {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
                 <ThemeSwitcher 
+                  activeThemeName={globalState.theme_name || 'Cyberpunk'}
+                  onThemeChange={handleThemeChange}
                   onLogout={handleLogout} 
                   onOpenSettings={() => setIsSettingsOpen(true)} 
                 />

@@ -100,7 +100,8 @@ const initDb = async () => {
         photo_widget_text TEXT,
         links JSONB,
         username TEXT UNIQUE,
-        music_url TEXT
+        music_url TEXT,
+        theme_name TEXT DEFAULT 'Cyberpunk'
       )
     `);
 
@@ -302,7 +303,10 @@ app.post('/api/auth/login', async (req, res) => {
         isPlaying: p.now_playing_is_playing 
       },
       photoWidgetText: p.photo_widget_text,
-      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : [])
+      links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
+      musicUrl: p.music_url || '',
+      theme_name: p.theme_name || 'Cyberpunk',
+      theme_name: p.theme_name || 'Cyberpunk'
     };
 
     res.json({ user: { email, name: userRes.rows[0].name }, profile });
@@ -323,14 +327,16 @@ app.post('/api/profile/update', async (req, res) => {
         mood_vibe = $4, mood_color = $5, 
         now_playing_title = $6, now_playing_artist = $7, now_playing_album_art = $8, 
         now_playing_is_playing = $9, photo_widget_text = $10,
-        links = $11, music_url = $12
-      WHERE email = $13
+        links = $11, music_url = $12, theme_name = $13
+      WHERE email = $14
     `, [
       profile.name, profile.bio, profile.avatarUrl,
       mood.vibe, mood.color,
       nowPlaying.title, nowPlaying.artist, nowPlaying.albumArt,
       nowPlaying.isPlaying, photoWidgetText, JSON.stringify(links), 
-      profileData.musicUrl || '', email
+      profileData.musicUrl || '', 
+      profileData.theme_name || 'Cyberpunk',
+      email
     ]);
 
     // Fetch updated profile to return
@@ -347,7 +353,8 @@ app.post('/api/profile/update', async (req, res) => {
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
       links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
-      musicUrl: p.music_url || ''
+      musicUrl: p.music_url || '',
+      theme_name: p.theme_name || 'Cyberpunk'
     };
 
     res.json({ profile: finalProfile });
@@ -375,7 +382,8 @@ app.get('/api/p/:username', async (req, res) => {
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
       links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
-      musicUrl: p.music_url || ''
+      musicUrl: p.music_url || '',
+      theme_name: p.theme_name || 'Cyberpunk'
     };
     res.json({ profile });
   } catch (err) {
@@ -701,3 +709,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ VibeCheck Full-Stack running on port ${PORT}`);
 });
+
