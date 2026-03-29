@@ -144,6 +144,39 @@ const initDb = async () => {
       )
     `);
 
+    // Create Likes table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS likes (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+        email TEXT REFERENCES users(email),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(post_id, email)
+      )
+    `);
+
+    // Create Comments table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS comments (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+        email TEXT REFERENCES users(email),
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create Vibes table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS vibes (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+        email TEXT REFERENCES users(email),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(post_id, email)
+      )
+    `);
+
     client.release();
     console.log("✅ PostgreSQL Tables Synced & Connected 🚀");
   } catch (err) {
@@ -434,17 +467,107 @@ app.post('/api/posts/create', upload.single('image'), async (req, res) => {
   }
 });
 
-// POSTS: Fetch for User
+// POSTS: Fetch for User (Refactored to include counts)
 app.get('/api/posts/:username', async (req, res) => {
   const { username } = req.params;
+  const { me } = req.query; // current user's email to check like/vibe status
   try {
     const postsRes = await pool.query(`
-      SELECT po.* FROM posts po
+      SELECT 
+        po.*,
+        (SELECT COUNT(*) FROM likes WHERE post_id = po.id) as likes_count,
+        (SELECT COUNT(*) FROM comments WHERE post_id = po.id) as comments_count,
+        (SELECT COUNT(*) FROM vibes WHERE post_id = po.id) as vibes_count,
+        EXISTS(SELECT 1 FROM likes WHERE post_id = po.id AND email = $2) as has_liked,
+        EXISTS(SELECT 1 FROM vibes WHERE post_id = po.id AND email = $2) as has_vibed
+      FROM posts po
       JOIN profiles pr ON po.email = pr.email
       WHERE pr.username = $1
       ORDER BY po.created_at DESC
-    `, [username]);
+    `, [username, me || '']);
     res.json({ posts: postsRes.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// INTERACTION: Like/Unlike
+app.post('/api/posts/:id/like', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  try {
+    await pool.query('INSERT INTO likes (post_id, email) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, email]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/posts/:id/like', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  try {
+    await pool.query('DELETE FROM likes WHERE post_id = $1 AND email = $2', [id, email]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// INTERACTION: Vibe
+app.post('/api/posts/:id/vibe', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  try {
+    await pool.query('INSERT INTO vibes (post_id, email) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, email]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// INTERACTION: Comments
+app.get('/api/posts/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const commentsRes = await pool.query(`
+      SELECT c.*, p.username, p.avatar_url 
+      FROM comments c
+      JOIN profiles p ON c.email = p.email
+      WHERE c.post_id = $1
+      ORDER BY c.created_at ASC
+    `, [id]);
+    res.json({ comments: commentsRes.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/posts/:id/comment', async (req, res) => {
+  const { id } = req.params;
+  const { email, content } = req.body;
+  try {
+    const comRes = await pool.query(
+      'INSERT INTO comments (post_id, email, content) VALUES ($1, $2, $3) RETURNING id',
+      [id, email, content]
+    );
+    res.json({ success: true, commentId: comRes.rows[0].id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// INTERACTION: Delete Post
+app.delete('/api/posts/:id', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  try {
+    const postOwner = await pool.query('SELECT email FROM posts WHERE id = $1', [id]);
+    if (postOwner.rows.length === 0) return res.status(404).json({ error: 'Post not found' });
+    if (postOwner.rows[0].email !== email) return res.status(403).json({ error: 'Unauthorized to delete' });
+
+    await pool.query('DELETE FROM posts WHERE id = $1', [id]);
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

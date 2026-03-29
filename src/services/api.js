@@ -98,9 +98,60 @@ export const api = {
     if (!res.ok) throw new Error('Post upload failed');
     return res.json();
   },
-  getUserPosts: async (username) => {
-    const res = await fetch(`${API_URL}/posts/${username}`);
+  getUserPosts: async (username, meEmail) => {
+    const url = meEmail ? `${API_URL}/posts/${username}?me=${encodeURIComponent(meEmail)}` : `${API_URL}/posts/${username}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to fetch posts');
+    return res.json();
+  },
+  likePost: async (postId, email) => {
+    const res = await fetch(`${API_URL}/posts/${postId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!res.ok) throw new Error('Like failed');
+    return res.json();
+  },
+  unlikePost: async (postId, email) => {
+    const res = await fetch(`${API_URL}/posts/${postId}/like`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!res.ok) throw new Error('Unlike failed');
+    return res.json();
+  },
+  vibePost: async (postId, email) => {
+    const res = await fetch(`${API_URL}/posts/${postId}/vibe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!res.ok) throw new Error('Vibe failed');
+    return res.json();
+  },
+  getComments: async (postId) => {
+    const res = await fetch(`${API_URL}/posts/${postId}/comments`);
+    if (!res.ok) throw new Error('Failed to fetch comments');
+    return res.json();
+  },
+  addComment: async (postId, email, content) => {
+    const res = await fetch(`${API_URL}/posts/${postId}/comment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, content })
+    });
+    if (!res.ok) throw new Error('Comment failed');
+    return res.json();
+  },
+  deletePost: async (postId, email) => {
+    const res = await fetch(`${API_URL}/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!res.ok) throw new Error('Delete failed');
     return res.json();
   },
   followUser: async (followerEmail, targetUsername) => {
