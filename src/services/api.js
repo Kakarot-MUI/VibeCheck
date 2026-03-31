@@ -131,6 +131,15 @@ export const api = {
     if (!res.ok) throw new Error('Vibe failed');
     return res.json();
   },
+  unvibePost: async (postId, email) => {
+    const res = await fetch(`${API_URL}/posts/${postId}/vibe`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!res.ok) throw new Error('Unvibe failed');
+    return res.json();
+  },
   getComments: async (postId) => {
     const res = await fetch(`${API_URL}/posts/${postId}/comments`);
     if (!res.ok) throw new Error('Failed to fetch comments');

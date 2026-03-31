@@ -575,6 +575,17 @@ app.post('/api/posts/:id/vibe', async (req, res) => {
   }
 });
 
+app.delete('/api/posts/:id/vibe', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  try {
+    await pool.query('DELETE FROM vibes WHERE post_id = $1 AND email = $2', [id, email]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // INTERACTION: Comments
 app.get('/api/posts/:id/comments', async (req, res) => {
   const { id } = req.params;

@@ -33,14 +33,22 @@ const PostCard = ({ post, userEmail, onDelete, onShowComments }) => {
   const handleVibe = async (e) => {
     e.stopPropagation();
     if (!userEmail) return alert("Login to vibe! ✨");
-    if (hasVibed) return;
+    
     try {
-      setIsVibing(true);
-      await api.vibePost(post.id, userEmail);
-      setVibes(prev => prev + 1);
-      setHasVibed(true);
-      // Particle effect duration
-      setTimeout(() => setIsVibing(false), 1500);
+      if (hasVibed) {
+        // UNVIBE
+        await api.unvibePost(post.id, userEmail);
+        setVibes(prev => Math.max(0, prev - 1));
+        setHasVibed(false);
+      } else {
+        // VIBE
+        setIsVibing(true);
+        await api.vibePost(post.id, userEmail);
+        setVibes(prev => prev + 1);
+        setHasVibed(true);
+        // Particle effect duration
+        setTimeout(() => setIsVibing(false), 1500);
+      }
     } catch (err) {
       console.error("Vibe error:", err);
     }
