@@ -79,9 +79,23 @@ const PostCard = ({ post, userEmail, onDelete, onShowComments }) => {
           <div className="vibe-check-overlay">
             <span className="vibe-text">VIBE CHECK</span>
             <div className="particles">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="particle" style={{ '--delay': `${i * 0.1}s`, '--angle': `${i * 30}deg` }}>✨</div>
-              ))}
+              {Array.from({ length: 24 }).map((_, i) => {
+                const emojis = ['✨', '⭐', '💫', '💜', '🔥'];
+                const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                return (
+                  <div 
+                    key={i} 
+                    className="particle" 
+                    style={{ 
+                      '--delay': `${i * 0.05}s`, 
+                      '--angle': `${i * 15}deg`,
+                      '--scale': 0.5 + Math.random() 
+                    }}
+                  >
+                    {emoji}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
