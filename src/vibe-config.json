@@ -16,7 +16,7 @@
     "isPlaying": false
   },
   "photoWidgetText": "Current Setup Vibe",
-  "photoWidgetImageUrl": "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  "photoWidgetImageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
   "links": [
     { "id": 1, "title": "My Favorite Links", "url": "https://", "platform": "default" }
   ]
