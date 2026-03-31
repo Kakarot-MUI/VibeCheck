@@ -410,15 +410,15 @@
 /* --- MESSAGE NOTIFICATIONS --- */
 .notification-badge {
   position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 12px;
-  height: 12px;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
   background: #ff4d4d;
-  border: 2.5px solid #1a1a2e;
+  border: 2px solid #1a1a2e;
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(255, 77, 77, 0.6);
-  z-index: 10;
+  z-index: 20;
   pointer-events: none;
   animation: badge-pulse 1.5s infinite ease-out;
 }
@@ -430,8 +430,8 @@
 }
 
 .floating-chat-trigger .notification-badge {
-  top: 5px;
-  right: 5px;
-  width: 14px;
-  height: 14px;
+  top: 12px;
+  right: 12px;
+  width: 11px;
+  height: 11px;
 }
