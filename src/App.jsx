@@ -87,10 +87,11 @@ function App() {
         try {
           const res = await api.getInbox(userEmail);
           const messages = res.messages || [];
-          if (messages.length === 0) return;
+          const receivedMessages = messages.filter(m => m.sender_email !== userEmail);
+          if (receivedMessages.length === 0) return;
 
           const lastReadTime = parseInt(localStorage.getItem('vibe_last_read_chat') || '0');
-          const latestMsgTime = Math.max(...messages.map(m => new Date(m.created_at).getTime()));
+          const latestMsgTime = Math.max(...receivedMessages.map(m => new Date(m.created_at).getTime()));
 
           if (latestMsgTime > lastReadTime) {
             // New message detected!
