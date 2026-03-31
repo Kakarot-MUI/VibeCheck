@@ -166,8 +166,49 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
               </div>
               <div className="setting-item">
                 <label>Photo Widget Image URL</label>
-                <input type="text" value={photoWidgetImageUrl} onChange={(e) => setPhotoWidgetImageUrl(e.target.value)} className="glass-input" placeholder="https://unsplash.com/..." />
-                <p className="input-hint">Paste an image link to update your setup vibe photo! 📸</p>
+                <input 
+                  type="text" 
+                  value={photoWidgetImageUrl} 
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Unsplash Normalizer
+                    if (val.includes('unsplash.com/photos/')) {
+                      const photoId = val.split('photos/')[1]?.split('?')[0];
+                      if (photoId) {
+                        setPhotoWidgetImageUrl(`https://images.unsplash.com/photo-${photoId}?auto=format&fit=crop&w=600&q=80`);
+                        return;
+                      }
+                    }
+                    setPhotoWidgetImageUrl(val);
+                  }} 
+                  className="glass-input" 
+                  placeholder="https://images.unsplash.com/..." 
+                />
+                <p className="input-hint">Paste an image link! (We auto-fix Unsplash links 🪄)</p>
+                
+                {/* Live Preview Section */}
+                {photoWidgetImageUrl && (
+                  <div className="url-preview-container">
+                    <p className="preview-label">Live Preview:</p>
+                    <div className="mini-polaroid-preview">
+                      <img 
+                        src={photoWidgetImageUrl} 
+                        alt="Preview" 
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                        onLoad={(e) => {
+                          e.target.style.display = 'block';
+                          e.target.nextSibling.style.display = 'none';
+                        }}
+                      />
+                      <div className="preview-error-msg" style={{ display: 'none' }}>
+                        <span>⚠️ Invalid Image Link</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
