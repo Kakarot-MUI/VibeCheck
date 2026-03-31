@@ -86,8 +86,14 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
           <h3>{selectedUser ? `@${selectedUser}` : 'Vibe Chats'}</h3>
         </div>
         <div className="header-actions">
-           {selectedUser && <button className="back-btn" onClick={() => setSelectedUser(null)}>←</button>}
-           <button className="close-btn" onClick={onClose}>✕</button>
+           {selectedUser && (
+             <button className="back-btn" onClick={() => setSelectedUser(null)} title="Back to inbox">
+               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+             </button>
+           )}
+           <button className="close-btn" onClick={onClose} title="Close Chat">
+             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+           </button>
         </div>
       </div>
 

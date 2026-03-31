@@ -48,7 +48,7 @@ const SocialDock = ({ links, isPublicView, onOpenChat }) => {
             </div>
           </a>
         ))}
-        {links && !isPublicView && (
+        {!isPublicView && (
           <button className="dock-icon-link message-trigger" onClick={onOpenChat} title="Vibe Chats">
              <div className="icon-wrapper">
                {getIcon('message')}
