@@ -29,14 +29,28 @@ const ProfileHeader = ({ profile, isPublicView, isFollowing, followStats, onTogg
       <div className="header-info">
         <div className="name-row">
           <h1 className="name text-glow">{displayProfile.name}</h1>
-          {showFollowButton && (
-            <button 
-              className={`follow-btn ${isFollowing ? 'following' : ''}`} 
-              onClick={onToggleFollow}
-            >
-              {isFollowing ? 'Following' : 'Follow'}
-            </button>
-          )}
+          <div className="header-actions-row" style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+            {showFollowButton && (
+              <button 
+                className={`follow-btn ${isFollowing ? 'following' : ''}`} 
+                onClick={onToggleFollow}
+              >
+                {isFollowing ? 'Following' : 'Follow'}
+              </button>
+            )}
+            {isPublicView && !isOwnProfile && (
+              <button 
+                className="message-btn-header"
+                onClick={() => {
+                  // We'll use a global event or a prop to open chat with this user
+                  window.dispatchEvent(new CustomEvent('open-vibe-chat', { detail: { username: displayProfile.username } }));
+                }}
+                title="Send a disappearing Vibe"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </button>
+            )}
+          </div>
         </div>
         <p className="username-tag">@{displayProfile.username}</p>
         <p className="bio">{displayProfile.bio}</p>

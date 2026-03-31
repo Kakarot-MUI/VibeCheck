@@ -26,13 +26,16 @@ const getIcon = (platform) => {
     ),
     linkedin: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    ),
+    message: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     )
   };
   const key = platform ? platform.toLowerCase() : 'default';
   return icons[key] || icons.github;
 };
 
-const SocialDock = ({ links }) => {
+const SocialDock = ({ links, isPublicView, onOpenChat }) => {
   return (
     <GlassCard className="social-dock" style={{ borderRadius: '32px', padding: '1.2rem 2rem' }}>
       <div className="dock-title">{links && links.length > 0 ? "Connect with me" : "No social links added"}</div>
@@ -45,6 +48,14 @@ const SocialDock = ({ links }) => {
             </div>
           </a>
         ))}
+        {links && !isPublicView && (
+          <button className="dock-icon-link message-trigger" onClick={onOpenChat} title="Vibe Chats">
+             <div className="icon-wrapper">
+               {getIcon('message')}
+               <div className="icon-glow" style={{ background: 'var(--accent-primary)' }}></div>
+             </div>
+          </button>
+        )}
         {(!links || links.length === 0) && (
            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Update in config file to see them here</p>
         )}

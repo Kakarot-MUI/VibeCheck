@@ -192,3 +192,37 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
+
+/* MUSIC VISUALIZER */
+.sound-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+  margin-left: 2px;
+}
+
+.sound-wave .bar {
+  width: 2.5px;
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: 2px;
+  opacity: 0.2;
+  transform: scaleY(0.5);
+  transition: all 0.3s ease;
+}
+
+.sound-wave.active .bar {
+  opacity: 1;
+  animation: wave-dance 1s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.sound-wave.active .bar:nth-child(1) { animation-delay: 0.1s; height: 60%; }
+.sound-wave.active .bar:nth-child(2) { animation-delay: 0.3s; height: 100%; }
+.sound-wave.active .bar:nth-child(3) { animation-delay: 0.2s; height: 80%; }
+
+@keyframes wave-dance {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.7; }
+  50% { transform: scaleY(1); opacity: 1; filter: brightness(1.2); }
+}

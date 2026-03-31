@@ -192,6 +192,28 @@ const initDb = async () => {
       )
     `);
 
+    // Create Profile Views table (Analytics)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS profile_views (
+        id SERIAL PRIMARY KEY,
+        profile_email TEXT REFERENCES users(email),
+        viewer_email TEXT REFERENCES users(email),
+        viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create Messages table (Disappearing)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        sender_email TEXT REFERENCES users(email),
+        receiver_email TEXT REFERENCES users(email),
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL
+      )
+    `);
+
     client.release();
     console.log("✅ PostgreSQL Tables Synced & Connected 🚀");
   } catch (err) {
@@ -765,6 +787,90 @@ app.get('/api/follow/counts/:username', async (req, res) => {
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
+// ANALYTICS: Record View
+app.post('/api/profile/view', async (req, res) => {
+  const { profileUsername, viewerEmail } = req.body;
+  try {
+    const profileRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [profileUsername]);
+    if (profileRes.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+    const profileEmail = profileRes.rows[0].email;
+
+    // Don't record self-views
+    if (profileEmail === viewerEmail) return res.json({ success: true, note: 'Self view ignored' });
+
+    await pool.query(
+      'INSERT INTO profile_views (profile_email, viewer_email) VALUES ($1, $2)',
+      [profileEmail, viewerEmail]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ANALYTICS: Get Recent Visitors
+app.get('/api/profile/analytics/:username', async (req, res) => {
+  const { username } = req.params;
+  try {
+    const profileRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [username]);
+    if (profileRes.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+    const profileEmail = profileRes.rows[0].email;
+
+    const visitors = await pool.query(`
+      SELECT DISTINCT ON (v.viewer_email) p.name, p.username, p.avatar_url, v.viewed_at
+      FROM profile_views v
+      JOIN profiles p ON v.viewer_email = p.email
+      WHERE v.profile_email = $1
+      ORDER BY v.viewer_email, v.viewed_at DESC
+      LIMIT 6
+    `, [profileEmail]);
+
+    // Re-sort by date after DISTINCT ON
+    const sortedVisitors = visitors.rows.sort((a, b) => new Date(b.viewed_at) - new Date(a.viewed_at));
+
+    res.json({ visitors: sortedVisitors });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// MESSAGING: Send Disappearing Message
+app.post('/api/messages/send', async (req, res) => {
+  const { senderEmail, receiverUsername, content } = req.body;
+  try {
+    const receiverRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [receiverUsername]);
+    if (receiverRes.rows.length === 0) return res.status(404).json({ error: 'Receiver not found' });
+    const receiverEmail = receiverRes.rows[0].email;
+
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
+    await pool.query(
+      'INSERT INTO messages (sender_email, receiver_email, content, expires_at) VALUES ($1, $2, $3, $4)',
+      [senderEmail, receiverEmail, content, expiresAt]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// MESSAGING: Get Inbox
+app.get('/api/messages/inbox/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    const messages = await pool.query(`
+      SELECT m.*, p.name as sender_name, p.username as sender_username, p.avatar_url as sender_avatar
+      FROM messages m
+      JOIN profiles p ON m.sender_email = p.email
+      WHERE m.receiver_email = $1 AND m.expires_at > NOW()
+      ORDER BY m.created_at DESC
+    `, [email]);
+    res.json({ messages: messages.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
   // 3. Serve Frontend (Unified Hosting)
   app.use((req, res, next) => {
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');

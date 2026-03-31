@@ -18,6 +18,7 @@ import StoriesBar from './components/StoriesBar';
 import StoryViewer from './components/StoryViewer';
 import PostsGrid from './components/PostsGrid';
 import FollowListModal from './components/FollowListModal';
+import VibeChat from './components/VibeChat';
 import { api } from './services/api';
 import './App.css';
 
@@ -27,6 +28,7 @@ function App() {
   const [myUsername, setMyUsername] = useState(localStorage.getItem('vibe_username') || null);
   const [globalState, setGlobalState] = useState(vibeConfigData);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isPublicView, setIsPublicView] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -35,6 +37,7 @@ function App() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
   const [showFollowList, setShowFollowList] = useState(null); // { type: 'followers' | 'following', username: string }
+  const [recentVisitors, setRecentVisitors] = useState([]);
 
   const themes = [
     { name: 'Cyberpunk', primary: '#8b5cf6', secondary: '#0ea5e9' },
@@ -42,6 +45,28 @@ function App() {
     { name: 'Midnight', primary: '#f43f5e', secondary: '#fb923c' },
     { name: 'Arctic', primary: '#06b6d4', secondary: '#a855f7' }
   ];
+
+  // Fetch Analytics for Owner
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (currentView === 'dashboard' && !isPublicView && myUsername) {
+        try {
+          const res = await api.getProfileAnalytics(myUsername);
+          setRecentVisitors(res.visitors);
+        } catch (e) {
+          console.error("Failed to fetch visitors:", e);
+        }
+      }
+    };
+    fetchAnalytics();
+  }, [currentView, isPublicView, myUsername]);
+
+  // Global Chat Trigger
+  useEffect(() => {
+    const handleChatTrigger = () => setIsChatOpen(true);
+    window.addEventListener('open-vibe-chat', handleChatTrigger);
+    return () => window.removeEventListener('open-vibe-chat', handleChatTrigger);
+  }, []);
 
   // Theme synchronization effect
   useEffect(() => {
@@ -79,6 +104,9 @@ function App() {
             if (meEmail) {
               const status = await api.getFollowStatus(meEmail, username);
               setIsFollowing(status.following);
+              
+              // NEW: Record view for analytics
+              api.recordProfileView(username, meEmail).catch(e => console.error("View log failed:", e));
             }
           } catch (err) {
             console.error("Public profile not found:", err);
@@ -345,6 +373,27 @@ function App() {
           </header>
 
           <main className="app-container">
+            {!isPublicView && recentVisitors.length > 0 && (
+              <div className="analytics-section reveal-1">
+                <div className="analytics-header">
+                  <span className="analytics-label">RECENT VIBE CHECKS</span>
+                </div>
+                <div className="visitor-list">
+                  {recentVisitors.map((visitor, idx) => (
+                    <div 
+                      key={idx} 
+                      className="visitor-avatar-wrap" 
+                      onClick={() => window.location.href = `/u/${visitor.username}`}
+                      title={`${visitor.name}Checked your vibe! ✨`}
+                    >
+                      <img src={visitor.avatar_url || 'https://via.placeholder.com/150'} className="visitor-avatar" alt={visitor.username} />
+                    </div>
+                  ))}
+                  <div className="visitor-more">+</div>
+                </div>
+              </div>
+            )}
+
             {!isPublicView && (
               <div className="stories-wrapper reveal-1">
                 <StoriesBar 
@@ -394,7 +443,11 @@ function App() {
                   text={globalState.photoWidgetText} 
                   imageUrl={globalState.photoWidgetImageUrl} 
                 />
-                <SocialDock links={globalState.links} />
+                <SocialDock 
+                  links={globalState.links} 
+                  isPublicView={isPublicView}
+                  onOpenChat={() => setIsChatOpen(true)}
+                />
               </div>
             </div>
           </main>
@@ -405,6 +458,14 @@ function App() {
               userEmail={userEmail}
               onSave={updateGlobalState} 
               onClose={() => setIsSettingsOpen(false)} 
+            />
+          )}
+
+          {isChatOpen && (
+            <VibeChat 
+              currentUserEmail={userEmail} 
+              isOpen={isChatOpen} 
+              onClose={() => setIsChatOpen(false)} 
             />
           )}
 

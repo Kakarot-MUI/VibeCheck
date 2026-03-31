@@ -62,7 +62,7 @@ const NowPlaying = ({ data, musicUrl, isOwnProfile, onDelete }) => {
               {isPlayerView ? 'Status' : 'Play 🎵'}
             </button>
           )}
-          <div className="sound-wave">
+          <div className={`sound-wave ${data.isPlaying ? 'active' : ''}`}>
             <div className="bar"></div>
             <div className="bar"></div>
             <div className="bar"></div>

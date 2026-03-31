@@ -216,5 +216,34 @@ export const api = {
     });
     if (!res.ok) throw new Error('Photo upload failed');
     return res.json();
+  },
+  // ANALYTICS
+  recordProfileView: async (profileUsername, viewerEmail) => {
+    const res = await fetch(`${API_URL}/profile/view`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileUsername, viewerEmail })
+    });
+    return res.json();
+  },
+  getProfileAnalytics: async (username) => {
+    const res = await fetch(`${API_URL}/profile/analytics/${username}`);
+    if (!res.ok) throw new Error('Failed to fetch analytics');
+    return res.json();
+  },
+  // MESSAGING
+  sendMessage: async (senderEmail, receiverUsername, content) => {
+    const res = await fetch(`${API_URL}/messages/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ senderEmail, receiverUsername, content })
+    });
+    if (!res.ok) throw new Error('Failed to send message');
+    return res.json();
+  },
+  getInbox: async (email) => {
+    const res = await fetch(`${API_URL}/messages/inbox/${email}`);
+    if (!res.ok) throw new Error('Failed to fetch inbox');
+    return res.json();
   }
 };
