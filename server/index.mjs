@@ -436,6 +436,27 @@ app.post('/api/stories/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+// WIDGET PHOTO UPLOAD
+app.post('/api/profile/upload-widget-photo', upload.single('image'), async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const imageUrl = `/stories/${req.file.filename}`;
+
+    // Update the profile in the database immediately
+    await pool.query(
+      'UPDATE profiles SET photo_widget_image_url = $1 WHERE email = $2',
+      [imageUrl, email]
+    );
+
+    res.json({ success: true, imageUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Widget photo upload failed' });
+  }
+});
+
 // Stories: Feed
 app.get('/api/stories/feed', async (req, res) => {
   try {

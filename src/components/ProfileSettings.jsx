@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
 import GlassCard from './GlassCard';
+import { api } from '../services/api';
 import './ProfileSettings.css';
 
-const ProfileSettings = ({ state, onSave, onClose }) => {
+const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
   // Tabs for better organization
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -19,7 +20,9 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
   const [links, setLinks] = useState(state.links || []);
   const [musicUrl, setMusicUrl] = useState(state.musicUrl || "");
 
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const widgetFileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -32,11 +35,31 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
     }
   };
 
+  const handleWidgetFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file && userEmail) {
+      try {
+        setLoading(true);
+        const res = await api.uploadWidgetPhoto(userEmail, file);
+        setPhotoWidgetImageUrl(res.imageUrl);
+        alert("Photo Uploaded! 🚀");
+      } catch (err) {
+        alert("Upload failed: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const triggerFilePicker = () => {
     const hasPermission = window.confirm("Allow VibeCheck to access your photos and media?");
     if (hasPermission) {
       fileInputRef.current.click();
     }
+  };
+
+  const triggerWidgetFilePicker = () => {
+    widgetFileInputRef.current.click();
   };
 
   const handleSubmit = (e) => {
@@ -68,6 +91,7 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
   return (
     <div className="modal-overlay">
       <GlassCard className="settings-modal reveal-1" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
+        {loading && <div className="modal-loader"><div className="loader"></div></div>}
         <div className="settings-header">
           <h2 className="heading text-glow">Customize Hub</h2>
           <button className="close-btn" onClick={onClose}>&times;</button>
@@ -166,25 +190,31 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
               </div>
               <div className="setting-item">
                 <label>Photo Widget Image URL</label>
-                <input 
-                  type="text" 
-                  value={photoWidgetImageUrl} 
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    // Unsplash Normalizer
-                    if (val.includes('unsplash.com/photos/')) {
-                      const photoId = val.split('photos/')[1]?.split('?')[0];
-                      if (photoId) {
-                        setPhotoWidgetImageUrl(`https://images.unsplash.com/photo-${photoId}?auto=format&fit=crop&w=600&q=80`);
-                        return;
+                <div className="upload-row-integrated">
+                  <input 
+                    type="text" 
+                    value={photoWidgetImageUrl} 
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      // Unsplash Normalizer
+                      if (val.includes('unsplash.com/photos/')) {
+                        const photoId = val.split('photos/')[1]?.split('?')[0];
+                        if (photoId) {
+                          setPhotoWidgetImageUrl(`https://images.unsplash.com/photo-${photoId}?auto=format&fit=crop&w=600&q=80`);
+                          return;
+                        }
                       }
-                    }
-                    setPhotoWidgetImageUrl(val);
-                  }} 
-                  className="glass-input" 
-                  placeholder="https://images.unsplash.com/..." 
-                />
-                <p className="input-hint">Paste an image link! (We auto-fix Unsplash links 🪄)</p>
+                      setPhotoWidgetImageUrl(val);
+                    }} 
+                    className="glass-input" 
+                    placeholder="https://images.unsplash.com/..." 
+                  />
+                  <button type="button" className="upload-mini-btn" title="Upload from Device" onClick={triggerWidgetFilePicker}>
+                    📁
+                  </button>
+                  <input type="file" ref={widgetFileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleWidgetFileChange} />
+                </div>
+                <p className="input-hint">Paste an image link or upload from your device! 📸</p>
                 
                 {/* Live Preview Section */}
                 {photoWidgetImageUrl && (

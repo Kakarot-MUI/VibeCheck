@@ -186,5 +186,17 @@ export const api = {
     const res = await fetch(`${API_URL}/follow/list/${username}?type=${type}`);
     if (!res.ok) throw new Error('Failed to fetch follow list');
     return res.json();
+  },
+  uploadWidgetPhoto: async (email, file) => {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('image', file);
+
+    const res = await fetch(`${API_URL}/profile/upload-widget-photo`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!res.ok) throw new Error('Photo upload failed');
+    return res.json();
   }
 };

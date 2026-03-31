@@ -390,6 +390,7 @@ function App() {
           {isSettingsOpen && (
             <ProfileSettings 
               state={globalState} 
+              userEmail={userEmail}
               onSave={updateGlobalState} 
               onClose={() => setIsSettingsOpen(false)} 
             />
