@@ -277,12 +277,29 @@
   height: calc(100% - 70px);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .vibe-chat-container.drawer {
-    width: 100vw;
-    right: -100vw;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    transform: translateY(100vh);
   }
-  .vibe-chat-container.standalone {
-    height: 80vh;
+
+  .vibe-chat-container.drawer.open {
+    transform: translateY(0);
+  }
+
+  .chat-header {
+    padding: 1rem;
+    padding-top: env(safe-area-inset-top, 1.2rem);
+  }
+
+  .chat-body {
+    padding: 1rem;
   }
 }

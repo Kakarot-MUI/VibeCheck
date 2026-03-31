@@ -170,14 +170,22 @@
   100% { transform: rotate(var(--angle)) translateY(90px); opacity: 0; } /* Fixed: reduced radius */
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .post-card {
-    border-radius: 12px;
+    border-radius: 0;
+    width: 100vw;
+    margin-left: calc(-1 * var(--dashboard-padding, 1rem));
+    border-left: none;
+    border-right: none;
   }
   .interaction-bar {
     gap: 0.8rem;
+    padding: 1rem;
   }
   .it-btn {
     padding: 0.3rem;
+  }
+  .post-details {
+    padding: 1rem;
   }
 }

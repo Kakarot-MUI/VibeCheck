@@ -348,3 +348,61 @@
   align-items: center;
   justify-content: center;
 }
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+  .app-layout {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .main-content-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .left-column, .right-column {
+    width: 100%;
+    gap: 1.5rem;
+  }
+
+  .glass-header {
+    padding: 0.8rem;
+  }
+
+  .header-actions {
+    gap: 0.4rem;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  /* Scale down header icons for mobile */
+  .icon-btn, .search-trigger {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0.4rem !important;
+  }
+
+  .nav-btn, .glass-btn-accent {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .floating-chat-trigger {
+    width: 3.5rem;
+    height: 3.5rem;
+    right: 1.5rem;
+    bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo h1 {
+    font-size: 1.1rem;
+  }
+  
+  .app-container {
+    padding: 0.5rem 0;
+  }
+}

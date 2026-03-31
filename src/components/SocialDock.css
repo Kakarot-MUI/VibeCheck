@@ -70,8 +70,13 @@
   transform: translate(-50%, -50%) scale(1.2);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .dock-icons {
-    gap: 1rem;
+    gap: 1.2rem;
+    justify-content: center;
+  }
+  
+  .dock-icon-link {
+    transform: scale(0.9);
   }
 }
