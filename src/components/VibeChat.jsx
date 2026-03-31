@@ -63,7 +63,8 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
         name: contactName,
         avatar: contactAvatar,
         lastMessage: msg.content,
-        id: msg.id
+        id: msg.id,
+        created_at: msg.created_at
       };
     }
   });
@@ -97,18 +98,23 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
             {contacts.length === 0 ? (
               <div className="empty-inbox">No active vibes yet. ✨</div>
             ) : (
-              contacts.map((c) => (
-                <div key={c.id} className="contact-item" onClick={() => setSelectedUser(c.username)}>
-                  <div className="avatar-wrap">
-                    <img src={c.avatar || 'https://via.placeholder.com/150'} alt={c.name} />
+              contacts.map((c) => {
+                const lastRead = parseInt(localStorage.getItem('vibe_last_read_chat') || '0');
+                const isUnread = new Date(c.created_at || 0).getTime() > lastRead;
+                
+                return (
+                  <div key={c.id} className="contact-item" onClick={() => setSelectedUser(c.username)}>
+                    <div className="avatar-wrap">
+                      <img src={c.avatar || 'https://via.placeholder.com/150'} alt={c.name} />
+                    </div>
+                    <div className="contact-info">
+                      <span className="contact-name">{c.name}</span>
+                      <span className="contact-preview">{c.lastMessage?.substring(0, 30)}...</span>
+                    </div>
+                    {isUnread && <div className="msg-status-dot"></div>}
                   </div>
-                  <div className="contact-info">
-                    <span className="contact-name">{c.name}</span>
-                    <span className="contact-preview">{c.lastMessage?.substring(0, 30)}...</span>
-                  </div>
-                  <div className="msg-time">New</div>
-                </div>
-              ))
+                );
+              })
             )}
             <div className="setup-hint" style={{ marginTop: '2rem', textAlign: 'center' }}>
                <p style={{ fontSize: '0.7rem', opacity: 0.5 }}>Search for a friend to start a vibe!</p>

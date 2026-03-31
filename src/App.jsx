@@ -39,6 +39,7 @@ function App() {
   const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
   const [showFollowList, setShowFollowList] = useState(null); // { type: 'followers' | 'following', username: string }
   const [recentVisitors, setRecentVisitors] = useState([]);
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
   const themes = [
     { name: 'Cyberpunk', primary: '#8b5cf6', secondary: '#0ea5e9' },
@@ -78,6 +79,47 @@ function App() {
     window.addEventListener('open-vibe-chat', handleChatTrigger);
     return () => window.removeEventListener('open-vibe-chat', handleChatTrigger);
   }, []);
+
+  // Message Polling & Notifications
+  useEffect(() => {
+    if (currentView === 'dashboard' && userEmail && !isPublicView) {
+      const checkUnread = async () => {
+        try {
+          const res = await api.getInbox(userEmail);
+          const messages = res.messages || [];
+          if (messages.length === 0) return;
+
+          const lastReadTime = parseInt(localStorage.getItem('vibe_last_read_chat') || '0');
+          const latestMsgTime = Math.max(...messages.map(m => new Date(m.created_at).getTime()));
+
+          if (latestMsgTime > lastReadTime) {
+            // New message detected!
+            if (!hasUnreadMessages && !isChatOpen) {
+              // Play subtle ping only if we weren't already unread and chat is closed
+              const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
+              audio.volume = 0.4;
+              audio.play().catch(e => console.log("Audio play blocked by browser policy"));
+            }
+            if (!isChatOpen) setHasUnreadMessages(true);
+          }
+        } catch (e) {
+          console.error("Unread check failed:", e);
+        }
+      };
+
+      checkUnread(); // Initial check
+      const interval = setInterval(checkUnread, 15000); // Poll every 15s
+      return () => clearInterval(interval);
+    }
+  }, [currentView, userEmail, isPublicView, isChatOpen]);
+
+  // Mark messages as read when drawer is opened
+  useEffect(() => {
+    if (isChatOpen) {
+      setHasUnreadMessages(false);
+      localStorage.setItem('vibe_last_read_chat', Date.now().toString());
+    }
+  }, [isChatOpen]);
 
   // Theme synchronization effect
   useEffect(() => {
@@ -460,6 +502,7 @@ function App() {
                   links={globalState.links} 
                   isPublicView={isPublicView}
                   onOpenChat={() => setIsChatOpen(true)}
+                  hasUnread={hasUnreadMessages}
                 />
               </div>
             </div>
@@ -519,6 +562,7 @@ function App() {
               <div className="fab-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               </div>
+              {hasUnreadMessages && <div className="notification-badge" />}
             </button>
           )}
 

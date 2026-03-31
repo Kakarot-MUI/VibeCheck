@@ -35,7 +35,7 @@ const getIcon = (platform) => {
   return icons[key] || icons.github;
 };
 
-const SocialDock = ({ links, isPublicView, onOpenChat }) => {
+const SocialDock = ({ links, isPublicView, onOpenChat, hasUnread }) => {
   return (
     <GlassCard className="social-dock" style={{ borderRadius: '32px', padding: '1.2rem 2rem' }}>
       <div className="dock-title">{links && links.length > 0 ? "Connect with me" : "No social links added"}</div>
@@ -54,6 +54,7 @@ const SocialDock = ({ links, isPublicView, onOpenChat }) => {
                {getIcon('message')}
                <div className="icon-glow" style={{ background: 'var(--accent-primary)' }}></div>
              </div>
+             {hasUnread && <div className="notification-badge" />}
           </button>
         )}
         {(!links || links.length === 0) && (

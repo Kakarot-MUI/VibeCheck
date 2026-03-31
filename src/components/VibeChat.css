@@ -250,9 +250,18 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.5); opacity: 0.5; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+/* Status Dot in Contact List */
+.msg-status-dot {
+  width: 10px;
+  height: 10px;
+  background: #ff4d4d;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+  animation: badge-pulse 1.5s infinite ease-out;
 }
 
 /* STANDALONE MODE (FOR TAB VIEW) */
