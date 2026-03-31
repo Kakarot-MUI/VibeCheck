@@ -2,12 +2,19 @@ import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import './VibeChat.css';
 
-const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) => {
+const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
   const [inbox, setInbox] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Sync with initialTarget prop (from App state or Events)
+  useEffect(() => {
+    if (initialTarget) {
+      setSelectedUser(initialTarget);
+    }
+  }, [initialTarget]);
 
   useEffect(() => {
     const handleGlobalTrigger = (e) => {
@@ -19,18 +26,16 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) =
   }, []);
 
   useEffect(() => {
-    if ((isOpen || isStandalone) && currentUserEmail) {
+    if (isOpen && currentUser?.email) {
       fetchInbox();
       const interval = setInterval(fetchInbox, 10000);
       return () => clearInterval(interval);
     }
-  }, [isOpen, isStandalone, currentUserEmail]);
-
-  // ... (rest of the logic remains same, just updating the return)
+  }, [isOpen, currentUser?.email]);
 
   const fetchInbox = async () => {
     try {
-      const res = await api.getInbox(currentUserEmail);
+      const res = await api.getInbox(currentUser.email);
       setInbox(res.messages);
     } catch (err) {
       console.error("Inbox fetch failed:", err);
@@ -43,7 +48,7 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) =
 
     try {
       setLoading(true);
-      await api.sendMessage(currentUserEmail, selectedUser, newMessage);
+      await api.sendMessage(currentUser.email, selectedUser, newMessage);
       setNewMessage('');
       fetchInbox();
     } catch (err) {
@@ -57,7 +62,7 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) =
     .map(username => inbox.find(m => m.sender_username === username));
 
   return (
-    <div className={`vibe-chat-container ${isStandalone ? 'standalone' : 'drawer'} ${isOpen ? 'open' : ''}`}>
+    <div className={`vibe-chat-container drawer ${isOpen ? 'open' : ''}`}>
       <div className="chat-header">
         <div className="header-info">
           <span className="vibe-dot"></span>
@@ -65,7 +70,7 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) =
         </div>
         <div className="header-actions">
            {selectedUser && <button className="back-btn" onClick={() => setSelectedUser(null)}>←</button>}
-           {!isStandalone && <button className="close-btn" onClick={onClose}>✕</button>}
+           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
       </div>
 
@@ -92,7 +97,7 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) =
               ))
             )}
             <div className="setup-hint" style={{ marginTop: '2rem', textAlign: 'center' }}>
-               <p style={{ fontSize: '0.7rem', opacity: 0.5 }}>Visit a profile to send a new vibe!</p>
+               <p style={{ fontSize: '0.7rem', opacity: 0.5 }}>Search for a friend to start a vibe!</p>
             </div>
           </div>
         ) : (

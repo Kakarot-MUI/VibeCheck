@@ -29,7 +29,7 @@ function App() {
   const [globalState, setGlobalState] = useState(vibeConfigData);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [activeMainTab, setActiveMainTab] = useState('posts'); // 'posts' | 'messages'
+  const [chatTarget, setChatTarget] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isPublicView, setIsPublicView] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -432,33 +432,11 @@ function App() {
                 />
                 <MoodBadge mood={globalState.mood} />
                 <ClockWidget />
-                <div className="main-tab-switcher">
-                  <button 
-                    className={`tab-item ${activeMainTab === 'posts' ? 'active' : ''}`}
-                    onClick={() => setActiveMainTab('posts')}
-                  >
-                    Vibes
-                  </button>
-                  <button 
-                    className={`tab-item ${activeMainTab === 'messages' ? 'active' : ''}`}
-                    onClick={() => setActiveMainTab('messages')}
-                  >
-                    Chats
-                  </button>
-                </div>
 
-                {activeMainTab === 'posts' ? (
-                  <PostsGrid 
-                    username={globalState.profile.username} 
-                    refreshTrigger={refreshPosts} 
-                  />
-                ) : (
-                  <VibeChat 
-                    currentUser={{ email: userEmail, ...globalState.profile }}
-                    targetUser={null} // Inbox mode
-                    isStandalone={true}
-                  />
-                )}
+                <PostsGrid 
+                  username={globalState.profile.username} 
+                  refreshTrigger={refreshPosts} 
+                />
               </div>
 
               {/* Right Column - Media & Socials */}
@@ -488,14 +466,6 @@ function App() {
               userEmail={userEmail}
               onSave={updateGlobalState} 
               onClose={() => setIsSettingsOpen(false)} 
-            />
-          )}
-
-          {isChatOpen && (
-            <VibeChat 
-              currentUserEmail={userEmail} 
-              isOpen={isChatOpen} 
-              onClose={() => setIsChatOpen(false)} 
             />
           )}
 
@@ -533,10 +503,30 @@ function App() {
             accept="image/*"
             onChange={handlePostChange}
           />
+
+          {/* Floating Message FAB */}
+          {!isPublicView && (
+            <button 
+              className="floating-chat-trigger reveal-3"
+              onClick={() => setIsChatOpen(true)}
+              title="Messages"
+            >
+              <div className="fab-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+            </button>
+          )}
+
+          <VibeChat 
+            isOpen={isChatOpen} 
+            onClose={() => setIsChatOpen(false)}
+            currentUser={{ email: userEmail, ...globalState.profile }}
+            initialTarget={chatTarget}
+          />
         </div>
       )}
     </>
-  )
+  );
 }
 
 export default App;

@@ -148,6 +148,38 @@
   color: #ff4d4d;
 }
 
+.message-btn-header {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.message-btn-header:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+}
+
+.message-btn-header svg {
+  opacity: 0.9;
+  transition: transform 0.3s;
+}
+
+.message-btn-header:hover svg {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 .bio {
   color: var(--text-muted);
   font-size: 1.05rem;

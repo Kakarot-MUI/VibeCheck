@@ -1,25 +1,37 @@
-.vibe-chat-drawer {
+/* Vibe Chat Container - Drawer Style */
+.vibe-chat-container.drawer {
   position: fixed;
-  top: 0;
-  right: -400px;
+  right: 1.5rem;
+  bottom: 7.5rem; /* Sits above the FAB */
   width: 380px;
-  height: 100vh;
-  background: rgba(13, 13, 18, 0.85);
-  backdrop-filter: blur(40px);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  z-index: 10000;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: calc(100vw - 3rem);
+  height: 600px;
+  max-height: calc(100vh - 10rem);
+  background: rgba(13, 13, 18, 0.95);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
-  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  transform: translateY(30px) scale(0.95);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 
-.vibe-chat-drawer.open {
-  right: 0;
+.vibe-chat-container.drawer.open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  visibility: visible;
 }
 
+/* Header & Shared Elements */
 .chat-header {
-  padding: 1.5rem;
+  padding: 1.2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
