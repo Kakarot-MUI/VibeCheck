@@ -416,6 +416,7 @@ function App() {
             <FollowListModal 
               username={showFollowList.username} 
               type={showFollowList.type} 
+              currentUserEmail={userEmail}
               onClose={() => setShowFollowList(null)} 
             />
           )}

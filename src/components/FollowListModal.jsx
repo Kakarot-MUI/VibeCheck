@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import './FollowListModal.css';
 
-const FollowListModal = ({ username, type, onClose }) => {
+const FollowListModal = ({ username, type, currentUserEmail, onClose }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const myUsername = localStorage.getItem('vibe_username');
+  const isMyProfile = username === myUsername;
 
   useEffect(() => {
     const fetchList = async () => {
@@ -19,6 +21,23 @@ const FollowListModal = ({ username, type, onClose }) => {
     };
     if (username && type) fetchList();
   }, [username, type]);
+
+  const handleAction = async (e, targetUsername) => {
+    e.stopPropagation();
+    if (!currentUserEmail) return;
+
+    try {
+      if (type === 'followers') {
+        await api.removeFollower(currentUserEmail, targetUsername);
+      } else {
+        await api.unfollowUser(currentUserEmail, targetUsername);
+      }
+      // Optimistic update: remove from local state immediately
+      setUsers(prev => prev.filter(u => u.username !== targetUsername));
+    } catch (err) {
+      alert("Failed to update connections: " + err.message);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -46,7 +65,16 @@ const FollowListModal = ({ username, type, onClose }) => {
                     <span className="user-name">{user.name}</span>
                     <span className="user-handle">@{user.username}</span>
                   </div>
-                  <div className="go-arrow">→</div>
+                  
+                  {isMyProfile && (
+                    <button 
+                      className={`action-btn ${type === 'followers' ? 'remove-btn' : 'unfollow-btn'}`}
+                      onClick={(e) => handleAction(e, user.username)}
+                    >
+                      {type === 'followers' ? 'Remove' : 'Unfollow'}
+                    </button>
+                  )}
+                  {!isMyProfile && <div className="go-arrow">→</div>}
                 </div>
               ))}
             </div>

@@ -672,6 +672,24 @@ app.post('/api/unfollow', async (req, res) => {
   }
 });
 
+// FOLLOW SYSTEM: Remove Follower (Triggered by the person being followed)
+app.post('/api/remove-follower', async (req, res) => {
+  const { myEmail, followerUsername } = req.body;
+  try {
+    const followerRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [followerUsername]);
+    if (followerRes.rows.length === 0) return res.status(404).json({ error: 'Follower user not found' });
+    const followerEmail = followerRes.rows[0].email;
+
+    await pool.query(
+      'DELETE FROM followers WHERE follower_email = $1 AND following_email = $2',
+      [followerEmail, myEmail]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // FOLLOW SYSTEM: Status
 app.get('/api/follow/status/:meEmail/:targetUsername', async (req, res) => {
   const { meEmail, targetUsername } = req.params;

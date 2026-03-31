@@ -181,6 +181,15 @@ export const api = {
     if (!res.ok) throw new Error('Unfollow failed');
     return res.json();
   },
+  removeFollower: async (myEmail, followerUsername) => {
+    const res = await fetch(`${API_URL}/remove-follower`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ myEmail, followerUsername })
+    });
+    if (!res.ok) throw new Error('Remove follower failed');
+    return res.json();
+  },
   getFollowStatus: async (meEmail, targetUsername) => {
     const res = await fetch(`${API_URL}/follow/status/${meEmail}/${targetUsername}`);
     if (!res.ok) throw new Error('Failed to fetch follow status');
