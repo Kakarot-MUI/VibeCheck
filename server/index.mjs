@@ -7,9 +7,21 @@ import fs from 'fs';
 import multer from 'multer';
 import pg from 'pg';
 import dotenv from 'dotenv';
-
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 dotenv.config();
+
+// Cloudinary Configuration
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+} else {
+  console.warn("⚠️ CLOUDINARY_CLOUD_NAME is not set. Native uploads will fail.");
+}
 
 const { Pool } = pg;
 const app = express();
@@ -32,15 +44,14 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer Setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
+// Cloudinary Multer Storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'vibe-check-uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
 });
 
 const upload = multer({ 
@@ -421,7 +432,7 @@ app.post('/api/stories/upload', upload.single('image'), async (req, res) => {
     const { email } = req.body;
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const imageUrl = `/stories/${req.file.filename}`;
+    const imageUrl = req.file.path;
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     await pool.query(
@@ -442,7 +453,7 @@ app.post('/api/profile/upload-widget-photo', upload.single('image'), async (req,
     const { email } = req.body;
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const imageUrl = `/stories/${req.file.filename}`;
+    const imageUrl = req.file.path;
 
     // Update the profile in the database immediately
     await pool.query(
@@ -492,7 +503,7 @@ app.post('/api/posts/create', upload.single('image'), async (req, res) => {
     const { email, caption } = req.body;
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const imageUrl = `/stories/${req.file.filename}`; // reusing stories folder for simplicity
+    const imageUrl = req.file.path;
     await pool.query(
       'INSERT INTO posts (email, image_url, caption) VALUES ($1, $2, $3)',
       [email, imageUrl, caption || '']
