@@ -278,10 +278,22 @@ function App() {
   };
 
   if (loading) {
-    return <div className="loading-screen bg-glow">
-      <div className="loader"></div>
-      <p>Syncing your vibes...</p>
-    </div>;
+    return (
+      <div className="vibe-loading-screen">
+        <div className="vibe-loader-container">
+          <div className="vibe-logo-pulse">
+            <img src="/favicon.svg" alt="VibeCheck Logo" className="vibe-logo-img" />
+            <div className="vibe-logo-ring"></div>
+          </div>
+          <div className="vibe-loader-content">
+            <h2 className="vibe-sync-text">Syncing your vibes...</h2>
+            <div className="vibe-progress-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
