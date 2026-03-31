@@ -17,15 +17,6 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
   }, [initialTarget]);
 
   useEffect(() => {
-    const handleGlobalTrigger = (e) => {
-      const { username } = e.detail;
-      setSelectedUser(username);
-    };
-    window.addEventListener('open-vibe-chat', handleGlobalTrigger);
-    return () => window.removeEventListener('open-vibe-chat', handleGlobalTrigger);
-  }, []);
-
-  useEffect(() => {
     if (isOpen && currentUser?.email) {
       fetchInbox();
       const interval = setInterval(fetchInbox, 8000);
@@ -106,14 +97,14 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
             {contacts.length === 0 ? (
               <div className="empty-inbox">No active vibes yet. ✨</div>
             ) : (
-              contacts.map((msg) => (
-                <div key={msg.id} className="contact-item" onClick={() => setSelectedUser(msg.sender_username)}>
+              contacts.map((c) => (
+                <div key={c.id} className="contact-item" onClick={() => setSelectedUser(c.username)}>
                   <div className="avatar-wrap">
-                    <img src={msg.sender_avatar || 'https://via.placeholder.com/150'} alt={msg.sender_name} />
+                    <img src={c.avatar || 'https://via.placeholder.com/150'} alt={c.name} />
                   </div>
                   <div className="contact-info">
-                    <span className="contact-name">{msg.sender_name}</span>
-                    <span className="contact-preview">{msg.content.substring(0, 30)}...</span>
+                    <span className="contact-name">{c.name}</span>
+                    <span className="contact-preview">{c.lastMessage?.substring(0, 30)}...</span>
                   </div>
                   <div className="msg-time">New</div>
                 </div>
