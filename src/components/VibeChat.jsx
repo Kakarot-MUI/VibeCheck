@@ -28,7 +28,7 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
   useEffect(() => {
     if (isOpen && currentUser?.email) {
       fetchInbox();
-      const interval = setInterval(fetchInbox, 10000);
+      const interval = setInterval(fetchInbox, 8000);
       return () => clearInterval(interval);
     }
   }, [isOpen, currentUser?.email]);
@@ -36,7 +36,7 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
   const fetchInbox = async () => {
     try {
       const res = await api.getInbox(currentUser.email);
-      setInbox(res.messages);
+      setInbox(res.messages || []);
     } catch (err) {
       console.error("Inbox fetch failed:", err);
     }
@@ -58,8 +58,25 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
     }
   };
 
-  const contacts = Array.from(new Set(inbox.map(m => m.sender_username)))
-    .map(username => inbox.find(m => m.sender_username === username));
+  // Derivative: Contacts (people the user has exchanged vibes with)
+  const contactsMap = {};
+  inbox.forEach(msg => {
+    const isSent = msg.sender_email === currentUser?.email;
+    const contactUsername = isSent ? msg.receiver_username : msg.sender_username;
+    const contactName = isSent ? msg.receiver_name : msg.sender_name;
+    const contactAvatar = isSent ? msg.receiver_avatar : msg.sender_avatar;
+
+    if (!contactsMap[contactUsername]) {
+      contactsMap[contactUsername] = {
+        username: contactUsername,
+        name: contactName,
+        avatar: contactAvatar,
+        lastMessage: msg.content,
+        id: msg.id
+      };
+    }
+  });
+  const contacts = Object.values(contactsMap);
 
   return (
     <div className={`vibe-chat-container drawer ${isOpen ? 'open' : ''}`}>
@@ -103,12 +120,18 @@ const VibeChat = ({ currentUser, isOpen, onClose, initialTarget }) => {
         ) : (
           <div className="conversation-view">
              <div className="message-list">
-                {inbox.filter(m => m.sender_username === selectedUser).map(msg => (
-                  <div key={msg.id} className="message-bubble received">
-                    <p>{msg.content}</p>
-                    <span className="expiry-tag">Vanishing soon...</span>
-                  </div>
-                ))}
+                {inbox
+                  .filter(m => (m.sender_username === selectedUser && m.receiver_email === currentUser?.email) || (m.receiver_username === selectedUser && m.sender_email === currentUser?.email))
+                  .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                  .map(msg => {
+                    const isSent = msg.sender_email === currentUser?.email;
+                    return (
+                      <div key={msg.id} className={`message-bubble ${isSent ? 'sent' : 'received'}`}>
+                        <p>{msg.content}</p>
+                        <span className="expiry-tag">{isSent ? 'Sent' : 'Vanishing soon...'}</span>
+                      </div>
+                    );
+                  })}
              </div>
              <form className="message-input-area" onSubmit={handleSendMessage}>
                 <input 

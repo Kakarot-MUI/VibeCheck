@@ -170,32 +170,48 @@
 }
 
 .message-bubble {
-  max-width: 85%;
-  padding: 1rem;
+  max-width: 80%;
+  padding: 0.8rem 1.2rem;
   border-radius: 18px;
   position: relative;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  animation: message-fade-in 0.3s ease-out;
+}
+
+@keyframes message-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .message-bubble.received {
   align-self: flex-start;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom-left-radius: 4px;
+}
+
+.message-bubble.sent {
+  align-self: flex-end;
+  background: var(--accent-primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .message-bubble p {
   font-size: 0.9rem;
   line-height: 1.4;
-  color: #fff;
+  margin: 0;
 }
 
 .expiry-tag {
   display: block;
   font-size: 0.65rem;
-  color: var(--accent-primary);
+  opacity: 0.7;
   margin-top: 0.4rem;
   font-weight: 700;
-  opacity: 0.8;
+  text-transform: uppercase;
 }
 
 .message-input-area {

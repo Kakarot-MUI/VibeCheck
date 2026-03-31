@@ -27,6 +27,11 @@
   color: var(--text-main);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-block;
 }
 
 .icon-wrapper {

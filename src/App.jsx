@@ -69,7 +69,12 @@ function App() {
 
   // Global Chat Trigger
   useEffect(() => {
-    const handleChatTrigger = () => setIsChatOpen(true);
+    const handleChatTrigger = (e) => {
+      if (e.detail?.username) {
+        setChatTarget(e.detail.username);
+      }
+      setIsChatOpen(true);
+    };
     window.addEventListener('open-vibe-chat', handleChatTrigger);
     return () => window.removeEventListener('open-vibe-chat', handleChatTrigger);
   }, []);

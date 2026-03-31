@@ -883,10 +883,14 @@ app.get('/api/messages/inbox/:email', async (req, res) => {
   const { email } = req.params;
   try {
     const messages = await pool.query(`
-      SELECT m.*, p.name as sender_name, p.username as sender_username, p.avatar_url as sender_avatar
+      SELECT 
+        m.*, 
+        p_sender.name as sender_name, p_sender.username as sender_username, p_sender.avatar_url as sender_avatar,
+        p_receiver.name as receiver_name, p_receiver.username as receiver_username, p_receiver.avatar_url as receiver_avatar
       FROM messages m
-      JOIN profiles p ON m.sender_email = p.email
-      WHERE m.receiver_email = $1 AND m.expires_at > NOW()
+      JOIN profiles p_sender ON m.sender_email = p_sender.email
+      JOIN profiles p_receiver ON m.receiver_email = p_receiver.email
+      WHERE (m.receiver_email = $1 OR m.sender_email = $1) AND m.expires_at > NOW()
       ORDER BY m.created_at DESC
     `, [email]);
     res.json({ messages: messages.rows });
