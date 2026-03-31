@@ -505,3 +505,39 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* GLASS TOGGLE SWITCH */
+.glass-toggle {
+  width: 44px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-toggle.active {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.toggle-handle {
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.glass-toggle.active .toggle-handle {
+  transform: translateX(20px);
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary);
+}

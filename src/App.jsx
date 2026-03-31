@@ -29,6 +29,7 @@ function App() {
   const [globalState, setGlobalState] = useState(vibeConfigData);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeMainTab, setActiveMainTab] = useState('posts'); // 'posts' | 'messages'
   const [loading, setLoading] = useState(false);
   const [isPublicView, setIsPublicView] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -52,14 +53,19 @@ function App() {
       if (currentView === 'dashboard' && !isPublicView && myUsername) {
         try {
           const res = await api.getProfileAnalytics(myUsername);
-          setRecentVisitors(res.visitors);
+          // If the backend says it's disabled for this user, clear the list
+          if (res.disabled) {
+            setRecentVisitors([]);
+          } else {
+            setRecentVisitors(res.visitors);
+          }
         } catch (e) {
           console.error("Failed to fetch visitors:", e);
         }
       }
     };
     fetchAnalytics();
-  }, [currentView, isPublicView, myUsername]);
+  }, [currentView, isPublicView, myUsername, globalState.profile.is_analytics_enabled]);
 
   // Global Chat Trigger
   useEffect(() => {
@@ -400,6 +406,7 @@ function App() {
                   userAvatar={globalState.profile.avatarUrl} 
                   onSelectStory={setViewingStories}
                   onAddStory={handleAddStory}
+                  viewerEmail={userEmail}
                 />
               </div>
             )}
@@ -425,10 +432,33 @@ function App() {
                 />
                 <MoodBadge mood={globalState.mood} />
                 <ClockWidget />
-                <PostsGrid 
-                  username={globalState.profile.username} 
-                  refreshTrigger={refreshPosts} 
-                />
+                <div className="main-tab-switcher">
+                  <button 
+                    className={`tab-item ${activeMainTab === 'posts' ? 'active' : ''}`}
+                    onClick={() => setActiveMainTab('posts')}
+                  >
+                    Vibes
+                  </button>
+                  <button 
+                    className={`tab-item ${activeMainTab === 'messages' ? 'active' : ''}`}
+                    onClick={() => setActiveMainTab('messages')}
+                  >
+                    Chats
+                  </button>
+                </div>
+
+                {activeMainTab === 'posts' ? (
+                  <PostsGrid 
+                    username={globalState.profile.username} 
+                    refreshTrigger={refreshPosts} 
+                  />
+                ) : (
+                  <VibeChat 
+                    currentUser={{ email: userEmail, ...globalState.profile }}
+                    targetUser={null} // Inbox mode
+                    isStandalone={true}
+                  />
+                )}
               </div>
 
               {/* Right Column - Media & Socials */}

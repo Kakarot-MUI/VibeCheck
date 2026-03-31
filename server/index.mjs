@@ -113,7 +113,8 @@ const initDb = async () => {
         links JSONB,
         username TEXT UNIQUE,
         music_url TEXT,
-        theme_name TEXT DEFAULT 'Cyberpunk'
+        theme_name TEXT DEFAULT 'Cyberpunk',
+        is_analytics_enabled BOOLEAN DEFAULT TRUE
       )
     `);
 
@@ -492,16 +493,27 @@ app.post('/api/profile/upload-widget-photo', upload.single('image'), async (req,
 
 // Stories: Feed
 app.get('/api/stories/feed', async (req, res) => {
+  const { viewerEmail } = req.query;
   try {
     const feedRes = await pool.query(`
       SELECT 
         p.username, p.name, p.avatar_url as avatar,
-        s.id, s.image_url
+        s.id, s.image_url, s.email
       FROM stories s
       JOIN profiles p ON s.email = p.email
       WHERE s.expires_at > NOW()
+      AND (
+        s.email = $1 
+        OR ($1 IS NOT NULL AND EXISTS (
+          SELECT 1 FROM followers f1 
+          WHERE f1.follower_email = $1 AND f1.following_email = s.email
+        ) AND EXISTS (
+          SELECT 1 FROM followers f2 
+          WHERE f2.follower_email = s.email AND f2.following_email = $1
+        ))
+      )
       ORDER BY s.created_at DESC
-    `);
+    `, [viewerEmail || null]);
     
     // Group by user manually for reliability
     const feedMap = {};
@@ -791,11 +803,17 @@ if (fs.existsSync(distPath)) {
 app.post('/api/profile/view', async (req, res) => {
   const { profileUsername, viewerEmail } = req.body;
   try {
+    // 1. Get profile email
     const profileRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [profileUsername]);
     if (profileRes.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
     const profileEmail = profileRes.rows[0].email;
 
-    // Don't record self-views
+    // 2. Check if viewer has analytics enabled
+    const viewerRes = await pool.query('SELECT is_analytics_enabled FROM profiles WHERE email = $1', [viewerEmail]);
+    const isViewerEnabled = viewerRes.rows.length > 0 ? viewerRes.rows[0].is_analytics_enabled : true;
+
+    // Don't record if viewer is private or self-viewing
+    if (!isViewerEnabled) return res.json({ success: true, note: 'Private viewer skipped' });
     if (profileEmail === viewerEmail) return res.json({ success: true, note: 'Self view ignored' });
 
     await pool.query(
@@ -812,8 +830,14 @@ app.post('/api/profile/view', async (req, res) => {
 app.get('/api/profile/analytics/:username', async (req, res) => {
   const { username } = req.params;
   try {
-    const profileRes = await pool.query('SELECT email FROM profiles WHERE username = $1', [username]);
+    const profileRes = await pool.query('SELECT email, is_analytics_enabled FROM profiles WHERE username = $1', [username]);
     if (profileRes.rows.length === 0) return res.status(404).json({ error: 'Profile not found' });
+    
+    // If owner has analytics disabled, they see nothing
+    if (!profileRes.rows[0].is_analytics_enabled) {
+      return res.json({ visitors: [], disabled: true });
+    }
+
     const profileEmail = profileRes.rows[0].email;
 
     const visitors = await pool.query(`

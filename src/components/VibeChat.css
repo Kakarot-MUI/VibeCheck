@@ -227,9 +227,34 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* STANDALONE MODE (FOR TAB VIEW) */
+.vibe-chat-container.standalone {
+  position: relative;
+  right: 0;
+  width: 100%;
+  height: 600px; /* Fixed height for the main column */
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.vibe-chat-container.standalone .chat-header {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vibe-chat-container.standalone .chat-body {
+  height: calc(100% - 70px);
+}
+
 @media (max-width: 480px) {
-  .vibe-chat-drawer {
+  .vibe-chat-container.drawer {
     width: 100vw;
     right: -100vw;
+  }
+  .vibe-chat-container.standalone {
+    height: 80vh;
   }
 }

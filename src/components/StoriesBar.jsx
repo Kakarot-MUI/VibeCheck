@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import './StoriesBar.css';
 
-const StoriesBar = ({ onSelectStory, onAddStory, userAvatar }) => {
+const StoriesBar = ({ onSelectStory, onAddStory, userAvatar, viewerEmail }) => {
   const [feed, setFeed] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFeed = async () => {
       try {
-        const res = await api.getStoriesFeed();
+        const res = await api.getStoriesFeed(viewerEmail);
         setFeed(res.feed);
       } catch (err) {
         console.error("Stories feed error:", err);
@@ -18,7 +18,7 @@ const StoriesBar = ({ onSelectStory, onAddStory, userAvatar }) => {
       }
     };
     fetchFeed();
-  }, []);
+  }, [viewerEmail]);
 
   return (
     <div className="stories-bar-container reveal-1">

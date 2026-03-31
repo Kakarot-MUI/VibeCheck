@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import './VibeChat.css';
 
-const VibeChat = ({ currentUserEmail, isOpen, onClose }) => {
+const VibeChat = ({ currentUserEmail, isOpen, onClose, isStandalone = false }) => {
   const [inbox, setInbox] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -13,34 +13,20 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose }) => {
     const handleGlobalTrigger = (e) => {
       const { username } = e.detail;
       setSelectedUser(username);
-      if (!isOpen) {
-        // We can't call onClose/setIsChatOpen directly as they are in App.jsx
-        // BUT we can click the message trigger or just wait for the user to click it
-        // Actually, we'll just handle opening it via a shared state in a real app
-        // For now, let's assume the trigger is hit
-      }
     };
     window.addEventListener('open-vibe-chat', handleGlobalTrigger);
     return () => window.removeEventListener('open-vibe-chat', handleGlobalTrigger);
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
-    if (isOpen && currentUserEmail) {
+    if ((isOpen || isStandalone) && currentUserEmail) {
       fetchInbox();
       const interval = setInterval(fetchInbox, 10000);
       return () => clearInterval(interval);
     }
-  }, [isOpen, currentUserEmail]);
+  }, [isOpen, isStandalone, currentUserEmail]);
 
-  useEffect(() => {
-    if (selectedUser) {
-      const filtered = inbox.filter(m => 
-        m.sender_username === selectedUser || m.receiver_email === selectedUser // This is a simplification
-      );
-      // In a real app, we'd fetch the specific conversation
-      fetchInbox(); 
-    }
-  }, [selectedUser]);
+  // ... (rest of the logic remains same, just updating the return)
 
   const fetchInbox = async () => {
     try {
@@ -67,12 +53,11 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose }) => {
     }
   };
 
-  // Group messages by contact for the inbox view
   const contacts = Array.from(new Set(inbox.map(m => m.sender_username)))
     .map(username => inbox.find(m => m.sender_username === username));
 
   return (
-    <div className={`vibe-chat-drawer ${isOpen ? 'open' : ''}`}>
+    <div className={`vibe-chat-container ${isStandalone ? 'standalone' : 'drawer'} ${isOpen ? 'open' : ''}`}>
       <div className="chat-header">
         <div className="header-info">
           <span className="vibe-dot"></span>
@@ -80,7 +65,7 @@ const VibeChat = ({ currentUserEmail, isOpen, onClose }) => {
         </div>
         <div className="header-actions">
            {selectedUser && <button className="back-btn" onClick={() => setSelectedUser(null)}>←</button>}
-           <button className="close-btn" onClick={onClose}>✕</button>
+           {!isStandalone && <button className="close-btn" onClick={onClose}>✕</button>}
         </div>
       </div>
 

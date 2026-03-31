@@ -21,6 +21,7 @@ const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
   // Social Links State
   const [links, setLinks] = useState(state.links || []);
   const [musicUrl, setMusicUrl] = useState(state.musicUrl || "");
+  const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState(state.profile.is_analytics_enabled ?? true);
 
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
@@ -67,7 +68,7 @@ const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave({ 
-      profile, 
+      profile: { ...profile, is_analytics_enabled: isAnalyticsEnabled }, 
       mood, 
       nowPlaying: { ...nowPlaying, isPlaying: nowPlaying.title !== "No music playing" }, 
       photoWidgetText,
@@ -201,6 +202,21 @@ const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
                   <span className="helper-text">This glowing orb reflects your energy.</span>
                 </div>
               </div>
+              <div className="setting-item" style={{ marginTop: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                    <label style={{ margin: 0, fontSize: '0.85rem' }}>Enable Vibe Analytics</label>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Track profile visitors (Anonymizes your visits if OFF)</span>
+                  </div>
+                  <div 
+                    className={`glass-toggle ${isAnalyticsEnabled ? 'active' : ''}`} 
+                    onClick={() => setIsAnalyticsEnabled(!isAnalyticsEnabled)}
+                  >
+                    <div className="toggle-handle"></div>
+                  </div>
+                </div>
+              </div>
+
               <div className="setting-item" style={{ marginTop: '1.5rem' }}>
                 <label>Photo Widget Title</label>
                 <input type="text" value={photoWidgetText} onChange={(e) => setPhotoWidgetText(e.target.value)} className="glass-input" placeholder="e.g. My Workspace" />

@@ -59,8 +59,8 @@ export const api = {
     if (!res.ok) throw new Error('Search failed');
     return res.json();
   },
-  getStoriesFeed: async () => {
-    const res = await fetch(`${API_URL}/stories/feed`);
+  getStoriesFeed: async (viewerEmail) => {
+    const res = await fetch(`${API_URL}/stories/feed?viewerEmail=${viewerEmail || ''}`);
     if (!res.ok) throw new Error('Failed to fetch stories');
     return res.json();
   },
