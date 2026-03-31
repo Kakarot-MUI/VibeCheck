@@ -120,10 +120,10 @@
 
 /* VIBE CHECK ANIMATION */
 @keyframes vibe-float {
-  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
   80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25); }
 }
 
 .vibe-check-overlay {
@@ -133,15 +133,18 @@
   transform: translate(-50%, -50%);
   z-index: 10;
   text-align: center;
-  width: 100%;
+  width: 90%; /* Fixed: avoid edge clipping */
+  pointer-events: none;
 }
 
 .vibe-text {
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 6vw, 1.8rem); /* Fixed: responsive font */
   font-weight: 900;
   color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   text-shadow: 0 0 20px var(--accent-primary), 0 0 40px var(--accent-primary);
-  animation: vibe-float 1.5s forwards ease-out;
+  animation: vibe-float 1.5s forwards cubic-bezier(0.19, 1, 0.22, 1);
   display: block;
 }
 
@@ -149,13 +152,13 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 50px;
-  height: 50px;
+  width: 1px; /* Center point */
+  height: 1px;
 }
 
 .particle {
   position: absolute;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   animation: explode 1.2s forwards ease-out;
   animation-delay: var(--delay);
   transform-origin: center;
@@ -164,7 +167,7 @@
 
 @keyframes explode {
   0% { transform: rotate(var(--angle)) translateY(0); opacity: 1; }
-  100% { transform: rotate(var(--angle)) translateY(120px); opacity: 0; }
+  100% { transform: rotate(var(--angle)) translateY(90px); opacity: 0; } /* Fixed: reduced radius */
 }
 
 @media (max-width: 480px) {
