@@ -14,6 +14,7 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
   const [nowPlaying, setNowPlaying] = useState(state.nowPlaying);
   // Widget State
   const [photoWidgetText, setPhotoWidgetText] = useState(state.photoWidgetText || "");
+  const [photoWidgetImageUrl, setPhotoWidgetImageUrl] = useState(state.photoWidgetImageUrl || "");
   // Social Links State
   const [links, setLinks] = useState(state.links || []);
   const [musicUrl, setMusicUrl] = useState(state.musicUrl || "");
@@ -45,6 +46,7 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
       mood, 
       nowPlaying: { ...nowPlaying, isPlaying: nowPlaying.title !== "No music playing" }, 
       photoWidgetText,
+      photoWidgetImageUrl,
       links,
       musicUrl
     });
@@ -161,6 +163,11 @@ const ProfileSettings = ({ state, onSave, onClose }) => {
               <div className="setting-item" style={{ marginTop: '1.5rem' }}>
                 <label>Photo Widget Title</label>
                 <input type="text" value={photoWidgetText} onChange={(e) => setPhotoWidgetText(e.target.value)} className="glass-input" placeholder="e.g. My Workspace" />
+              </div>
+              <div className="setting-item">
+                <label>Photo Widget Image URL</label>
+                <input type="text" value={photoWidgetImageUrl} onChange={(e) => setPhotoWidgetImageUrl(e.target.value)} className="glass-input" placeholder="https://unsplash.com/..." />
+                <p className="input-hint">Paste an image link to update your setup vibe photo! 📸</p>
               </div>
             </div>
           )}

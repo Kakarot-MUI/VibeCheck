@@ -378,7 +378,10 @@ function App() {
                   isOwnProfile={myUsername === globalState.profile.username}
                   onDelete={handleDeleteMusic}
                 />
-                <PhotoWidget text={globalState.photoWidgetText} />
+                <PhotoWidget 
+                  text={globalState.photoWidgetText} 
+                  imageUrl={globalState.photoWidgetImageUrl} 
+                />
                 <SocialDock links={globalState.links} />
               </div>
             </div>

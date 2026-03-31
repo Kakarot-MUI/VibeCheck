@@ -98,6 +98,7 @@ const initDb = async () => {
         now_playing_album_art TEXT,
         now_playing_is_playing BOOLEAN,
         photo_widget_text TEXT,
+        photo_widget_image_url TEXT,
         links JSONB,
         username TEXT UNIQUE,
         music_url TEXT,
@@ -109,6 +110,7 @@ const initDb = async () => {
     try {
       await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS music_url TEXT');
       await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS theme_name TEXT DEFAULT \'Cyberpunk\'');
+      await client.query('ALTER TABLE profiles ADD COLUMN IF NOT EXISTS photo_widget_image_url TEXT');
     } catch (migErr) {
       console.warn("⚠️ Migration Note (schema updates):", migErr.message);
     }
@@ -256,6 +258,7 @@ app.post('/api/auth/register', async (req, res) => {
       now_playing_album_art: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
       now_playing_is_playing: false,
       photo_widget_text: "Current Setup Vibe",
+      photo_widget_image_url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
       links: JSON.stringify([])
     };
 
@@ -263,13 +266,14 @@ app.post('/api/auth/register', async (req, res) => {
       INSERT INTO profiles (
         email, name, username, bio, avatar_url, mood_vibe, mood_color, 
         now_playing_title, now_playing_artist, now_playing_album_art, 
-        now_playing_is_playing, photo_widget_text, links
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        now_playing_is_playing, photo_widget_text, photo_widget_image_url, links
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `, [
       email, defaultProfile.name, defaultProfile.username, defaultProfile.bio, defaultProfile.avatar_url,
       defaultProfile.mood_vibe, defaultProfile.mood_color, defaultProfile.now_playing_title,
       defaultProfile.now_playing_artist, defaultProfile.now_playing_album_art,
-      defaultProfile.now_playing_is_playing, defaultProfile.photo_widget_text, defaultProfile.links
+      defaultProfile.now_playing_is_playing, defaultProfile.photo_widget_text, 
+      defaultProfile.photo_widget_image_url, defaultProfile.links
     ]);
 
     res.json({ message: 'User registered successfully' });
@@ -304,9 +308,9 @@ app.post('/api/auth/login', async (req, res) => {
         isPlaying: p.now_playing_is_playing 
       },
       photoWidgetText: p.photo_widget_text,
+      photoWidgetImageUrl: p.photo_widget_image_url,
       links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
       musicUrl: p.music_url || '',
-      theme_name: p.theme_name || 'Cyberpunk',
       theme_name: p.theme_name || 'Cyberpunk'
     };
 
@@ -328,8 +332,9 @@ app.post('/api/profile/update', async (req, res) => {
         mood_vibe = $4, mood_color = $5, 
         now_playing_title = $6, now_playing_artist = $7, now_playing_album_art = $8, 
         now_playing_is_playing = $9, photo_widget_text = $10,
-        links = $11, music_url = $12, theme_name = $13
-      WHERE email = $14
+        links = $11, music_url = $12, theme_name = $13,
+        photo_widget_image_url = $14
+      WHERE email = $15
     `, [
       profile.name, profile.bio, profile.avatarUrl,
       mood.vibe, mood.color,
@@ -337,6 +342,7 @@ app.post('/api/profile/update', async (req, res) => {
       nowPlaying.isPlaying, photoWidgetText, JSON.stringify(links), 
       profileData.musicUrl || '', 
       profileData.theme_name || 'Cyberpunk',
+      profileData.photoWidgetImageUrl || '',
       email
     ]);
 
@@ -353,6 +359,7 @@ app.post('/api/profile/update', async (req, res) => {
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
+      photoWidgetImageUrl: p.photo_widget_image_url,
       links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
       musicUrl: p.music_url || '',
       theme_name: p.theme_name || 'Cyberpunk'
@@ -382,6 +389,7 @@ app.get('/api/p/:username', async (req, res) => {
       mood: { vibe: p.mood_vibe, color: p.mood_color },
       nowPlaying: { title: p.now_playing_title, artist: p.now_playing_artist, albumArt: p.now_playing_album_art, isPlaying: p.now_playing_is_playing },
       photoWidgetText: p.photo_widget_text,
+      photoWidgetImageUrl: p.photo_widget_image_url,
       links: Array.isArray(p.links) ? p.links : (typeof p.links === 'string' ? JSON.parse(p.links) : []),
       musicUrl: p.music_url || '',
       theme_name: p.theme_name || 'Cyberpunk'
@@ -710,4 +718,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ VibeCheck Full-Stack running on port ${PORT}`);
 });
+
 
