@@ -16,6 +16,8 @@ const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
   // Widget State
   const [photoWidgetText, setPhotoWidgetText] = useState(state.photoWidgetText || "");
   const [photoWidgetImageUrl, setPhotoWidgetImageUrl] = useState(state.photoWidgetImageUrl || "");
+  // Theme State
+  const [themeName, setThemeName] = useState(state.theme_name || 'Cyberpunk');
   // Social Links State
   const [links, setLinks] = useState(state.links || []);
   const [musicUrl, setMusicUrl] = useState(state.musicUrl || "");
@@ -70,6 +72,7 @@ const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
       nowPlaying: { ...nowPlaying, isPlaying: nowPlaying.title !== "No music playing" }, 
       photoWidgetText,
       photoWidgetImageUrl,
+      theme_name: themeName,
       links,
       musicUrl
     });
@@ -176,6 +179,20 @@ const ProfileSettings = ({ state, userEmail, onSave, onClose }) => {
               <div className="setting-item">
                 <label>Current Vibe (Text)</label>
                 <input type="text" value={mood.vibe} onChange={(e) => setMood({...mood, vibe: e.target.value})} className="glass-input" placeholder="e.g. Chilling 🧊" />
+              </div>
+              <div className="setting-item">
+                <label>Dashboard Theme</label>
+                <select 
+                  value={themeName} 
+                  onChange={(e) => setThemeName(e.target.value)}
+                  className="glass-input"
+                  style={{ cursor: 'pointer' }}
+                >
+                  <option value="Cyberpunk">Cyberpunk (Default)</option>
+                  <option value="Emerald">Emerald (Green)</option>
+                  <option value="Sunset">Sunset (Orange/Pink)</option>
+                  <option value="Midnight">Midnight (Dark Blue)</option>
+                </select>
               </div>
               <div className="setting-item">
                 <label>Vibe Color</label>
